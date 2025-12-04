@@ -30,7 +30,7 @@ def main():
 
     parser.add_argument("input")
     parser.add_argument("-o", "--output", nargs = "?", default = DEFAULT_OUTPUT)
-    parser.add_argument("-n", "--every", nargs = "?", default = DEFAULT_STROBE_EVERY)
+    parser.add_argument("-n", "--every", type = int, nargs = "?", default = DEFAULT_STROBE_EVERY)
 
     args = parser.parse_args()
 
