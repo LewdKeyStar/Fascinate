@@ -1,21 +1,10 @@
-from math import lcm
+from src.filter_utils import enable_conds
 
 def invert_filter(strobe_every, strobe_pause, should_invert_strobe_pause):
-    def enforce_strobe_every(strobe_every):
-        return f"eq(mod(n, {strobe_every}), 0)"
-
-    def enforce_strobe_pause(strobe_every, strobe_pause, should_invert_strobe_pause):
-
-        compar_func = "gte" if should_invert_strobe_pause else "lt"
-
-        return "1" if strobe_pause == 0 \
-        else f"{compar_func}(mod(n, {2*lcm(strobe_every,strobe_pause)}), {lcm(strobe_every,strobe_pause)})"
-
-    return f'''lutrgb=r=negval:g=negval:b=negval:enable='{
-        enforce_strobe_every(strobe_every)
-    } * {
-        enforce_strobe_pause(strobe_every, strobe_pause, should_invert_strobe_pause)
-    }\''''
+    return (
+        "lutrgb=r=negval:g=negval:b=negval:"
+        f"{enable_conds(strobe_every, strobe_pause, should_invert_strobe_pause)}"
+    )
 
 # For GIF management ;
 # Without a separate palette for each GIF frame, noticeable quantization noise appears.
