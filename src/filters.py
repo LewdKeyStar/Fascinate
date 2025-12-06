@@ -1,9 +1,18 @@
-from src.filter_utils import strobe_enable_conds
+from src.filter_utils import (
+    strobe_enable_conds,
+    enable_every
+)
 
 def invert_filter(strobe_every, strobe_pause, should_invert_strobe_pause):
     return (
         "lutrgb=r=negval:g=negval:b=negval:"
         f"{strobe_enable_conds(strobe_every, strobe_pause, should_invert_strobe_pause)}"
+    )
+
+def rgbshift_filter(shift_intensity, shift_every):
+    return (
+        f"rgbashift=rh={shift_intensity}:gh={-shift_intensity}:"
+        f"enable={enable_every(shift_every)}"
     )
 
 # For GIF management ;

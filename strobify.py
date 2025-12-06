@@ -4,12 +4,15 @@ from argparse import ArgumentParser, BooleanOptionalAction
 
 from src.filters import (
     invert_filter,
+    rgbshift_filter,
     palette_filter
 )
 
 DEFAULT_OUTPUT = "default" # This is just a placeholder, not an actual filename.
 DEFAULT_STROBE_EVERY = 2
 DEFAULT_STROBE_PAUSE = 0
+DEFAULT_RGB_SHIFT_INTENSITY = 5
+DEFAULT_RGB_SHIFT_EVERY = 2
 
 def to_output_name(args):
     input_name, input_ext = splitext(args.input)
@@ -19,12 +22,22 @@ def to_output_name(args):
         f'_pause_{args.pause}' if args.pause > 0 else ''
     }{
         "_inverted" if args.pause > 0 and args.invert_pause else ''
+    }{
+        (
+            f'_rgb_{args.rgb_shift_intensity}px'
+            f'_every_{args.rgb_shift_every}'
+        ) if args.rgb_shift else ''
     }'''+input_ext
 
 def appropriate_filters(args):
-    return ",".join([
+    all_filters = [
         invert_filter(args.every, args.pause, args.invert_pause),
+        rgbshift_filter(args.rgb_shift_intensity, args.rgb_shift_every) if args.rgb_shift else "",
         palette_filter() if splitext(args.input)[1].lower() == ".gif" else ""
+    ]
+    
+    return ",".join([
+        filter for filter in all_filters if filter != ""
     ])
 
 def main():
@@ -36,7 +49,11 @@ def main():
     parser.add_argument("-n", "--every", type = int, nargs = "?", default = DEFAULT_STROBE_EVERY)
 
     parser.add_argument("-p", "--pause", type = int, nargs = "?", default = DEFAULT_STROBE_PAUSE)
-    parser.add_argument("-i", "--invert-pause", default = False, action = BooleanOptionalAction)
+    parser.add_argument("-ip", "--invert-pause", default = False, action = BooleanOptionalAction)
+
+    parser.add_argument("-rgb", "--rgb-shift", default = False, action = BooleanOptionalAction)
+    parser.add_argument("-rsi", "--rgb-shift-intensity", type = int, nargs = "?", default = DEFAULT_RGB_SHIFT_INTENSITY)
+    parser.add_argument("-rse", "--rgb-shift-every", type = int, nargs = "?", default = DEFAULT_RGB_SHIFT_EVERY)
 
     args = parser.parse_args()
 
