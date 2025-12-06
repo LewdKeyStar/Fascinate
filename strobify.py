@@ -29,6 +29,8 @@ def to_output_name(args):
     }{
         f'_pause_{args.pause}' if args.pause > 0 else ''
     }{
+        f'_active_{args.active}' if args.pause > 0 and args.active > 0 else ''
+    }{
         "_inverted" if args.pause > 0 and args.invert_pause else ''
     }{
         (
@@ -46,6 +48,7 @@ def appropriate_filters(args):
             args.end_strobe_at,
             args.every,
             args.pause,
+            args.active,
             args.invert_pause
         ),
 
@@ -74,6 +77,7 @@ def main():
     parser.add_argument("-s", "--start-strobe-at", type = int, nargs = "?", default = 0)
     parser.add_argument("-e", "--end-strobe-at", type = int, nargs = "?", default = UINT32_MAX)
 
+    parser.add_argument("-a", "--active", type=int, nargs = "?", default = DEFAULT_STROBE_PAUSE)
     parser.add_argument("-p", "--pause", type = int, nargs = "?", default = DEFAULT_STROBE_PAUSE)
     parser.add_argument("-ip", "--invert-pause", default = False, action = BooleanOptionalAction)
 

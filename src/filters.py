@@ -7,6 +7,7 @@ def invert_filter(
     strobe_every,
 
     strobe_pause,
+    strobe_active,
     should_invert_strobe_pause
 ):
     return (
@@ -15,7 +16,12 @@ def invert_filter(
             enable_from(start_strobe_at),
             enable_until(end_strobe_at),
             enable_every(start_strobe_at, strobe_every),
-            enable_at_interval(start_strobe_at, strobe_pause, should_invert_strobe_pause)
+            enable_at_interval(
+                start_strobe_at,
+                should_invert_strobe_pause,
+                pause_interval = strobe_pause,
+                active_interval = strobe_active
+            )
         )}'''
     )
 
