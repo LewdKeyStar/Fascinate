@@ -15,17 +15,15 @@ def enable_until(end):
 
 # Trigger filter only every n frames.
 
-def enable_every(freq):
-    return f"'eq(mod(n, {freq}), 0)'"
+def enable_every(start, freq):
+    return f"'eq(mod(n-{start}, {freq}), 0)'"
 
-# Assuming a filter is enabled every n frames, trigger it only for a certain interval of time,
+# Trigger a filter only for a certain interval of time,
 # Then pause for that same interval and so on.
-# This can be generalized to a filter that isn't enabled every n frames,
-# Just by defining freq = 1.
 
-def enable_at_interval(freq, interval, should_invert):
+def enable_at_interval(start, interval, should_invert):
 
     compar_func = "gte" if should_invert else "lt"
 
     return "1" if interval == 0 \
-    else f"'{compar_func}(mod(n, {2*lcm(freq, interval)}), {lcm(freq, interval)})'"
+    else f"'{compar_func}(mod(n-{start}, {2*interval}), {interval})'"

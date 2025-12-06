@@ -14,8 +14,8 @@ def invert_filter(
         f'''enable={join_and(
             enable_from(start_strobe_at),
             enable_until(end_strobe_at),
-            enable_every(strobe_every),
-            enable_at_interval(strobe_every, strobe_pause, should_invert_strobe_pause)
+            enable_every(start_strobe_at, strobe_every),
+            enable_at_interval(start_strobe_at, strobe_pause, should_invert_strobe_pause)
         )}'''
     )
 
@@ -25,7 +25,7 @@ def rgbshift_filter(start_shift_at, end_shift_at, shift_intensity, shift_every):
         f'''enable={join_and(
             enable_from(start_shift_at),
             enable_until(end_shift_at),
-            enable_every(shift_every)
+            enable_every(start_shift_at, shift_every)
         )}'''
     )
 
