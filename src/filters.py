@@ -1,9 +1,9 @@
-from src.filter_utils import enable_conds
+from src.filter_utils import strobe_enable_conds
 
 def invert_filter(strobe_every, strobe_pause, should_invert_strobe_pause):
     return (
         "lutrgb=r=negval:g=negval:b=negval:"
-        f"{enable_conds(strobe_every, strobe_pause, should_invert_strobe_pause)}"
+        f"{strobe_enable_conds(strobe_every, strobe_pause, should_invert_strobe_pause)}"
     )
 
 # For GIF management ;
