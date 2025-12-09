@@ -25,13 +25,30 @@ def invert_filter(
         )}'''
     )
 
-def rgbshift_filter(start_shift_at, end_shift_at, shift_intensity, shift_every):
+def rgbshift_filter(
+    shift_intensity,
+    
+    start_shift_at,
+    end_shift_at,
+
+    shift_every,
+
+    shift_pause,
+    shift_active,
+    should_invert_shift_pause
+):
     return (
         f"rgbashift=rh={shift_intensity}:gh={-shift_intensity}:"
         f'''enable={join_and(
             enable_from(start_shift_at),
             enable_until(end_shift_at),
-            enable_every(start_shift_at, shift_every)
+            enable_every(start_shift_at, shift_every),
+            enable_at_interval(
+                start_shift_at,
+                should_invert_shift_pause,
+                pause_interval = shift_pause,
+                active_interval = shift_active
+            )
         )}'''
     )
 
@@ -47,6 +64,8 @@ def zoom_filter(
     start_zoom_at,
     end_zoom_at,
 
+    zoom_every,
+
     zoom_pause,
     zoom_active,
     should_invert_zoom_pause,
@@ -60,6 +79,7 @@ def zoom_filter(
         f'''[orig][zoomed_alpha]overlay=enable={join_and(
             enable_from(start_zoom_at),
             enable_until(end_zoom_at),
+            enable_every(start_zoom_at, zoom_every),
             enable_at_interval(
                 start_zoom_at,
                 should_invert_zoom_pause,
