@@ -65,7 +65,7 @@ def appropriate_filters(args, *, resolution, fps):
             args.strobe_pause,
             args.strobe_active,
             args.strobe_invert_pause
-        ),
+        ) if args.strobe else "",
 
         rgbshift_filter(
             args.rgb_shift_intensity,
@@ -97,7 +97,7 @@ def appropriate_filters(args, *, resolution, fps):
             args.zoom_pause,
             args.zoom_active,
             args.zoom_invert_pause
-        ),
+        ) if args.zoom else "",
 
         palette_filter() if splitext(args.input)[1].lower() == ".gif" else ""
     ]
