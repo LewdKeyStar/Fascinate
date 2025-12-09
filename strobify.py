@@ -10,14 +10,23 @@ from src.ffprobe_utils import (
 from src.filters import (
     invert_filter,
     rgbshift_filter,
+    zoom_filter,
     palette_filter
 )
 
 DEFAULT_OUTPUT = "default" # This is just a placeholder, not an actual filename.
+
 DEFAULT_STROBE_EVERY = 2
 DEFAULT_STROBE_PAUSE = 0
+
 DEFAULT_RGB_SHIFT_INTENSITY = 5
 DEFAULT_RGB_SHIFT_EVERY = 2
+
+DEFAULT_ZOOM_FACTOR = 2
+DEFAULT_ZOOM_CENTER_X = 0 # TODO : relative coordinates instead?
+DEFAULT_ZOOM_CENTER_Y = 0
+DEFAULT_ZOOM_ALPHA = 0.5
+DEFAULT_ZOOM_PAUSE = 0
 
 ## FFMPEG uses this as its upper bound.
 
@@ -44,6 +53,17 @@ def to_output_name(args):
             + (f'_start_from_{args.rgb_shift_start_at}' if args.rgb_shift_start_at > 0 else '')
             + (f'_end_at_{args.rgb_shift_end_at}' if args.rgb_shift_end_at < UINT32_MAX else '')
         ) if args.rgb_shift else ''
+    }{
+        (
+            f'_zoom_{args.zoom_factor}x'
+            f'_into_({args.zoom_center_x},{args.zoom_center_y})'
+            + (f'_start_from_{args.zoom_start_at}' if args.zoom_start_at > 0 else '')
+            + (f'_end_at_{args.zoom_end_at}' if args.zoom_end_at < UINT32_MAX else '')
+            + (f'_pause_{args.zoom_pause}' if args.zoom_pause > 0 else '')
+            + (f'_active_{args.zoom_active}' if args.zoom_pause > 0 and args.zoom_active > 0 else '')
+            + (f'_inverted' if args.zoom_invert_pause else '')
+            + f'_alpha_{args.zoom_alpha}'
+        ) if args.zoom else ''
     }'''+input_ext
 
 def appropriate_filters(args, *, resolution, fps):
@@ -63,6 +83,23 @@ def appropriate_filters(args, *, resolution, fps):
             args.rgb_shift_intensity,
             args.rgb_shift_every
         ) if args.rgb_shift else "",
+
+        zoom_filter(
+            resolution,
+            fps,
+
+            args.zoom_factor,
+            args.zoom_center_x,
+            args.zoom_center_y,
+            args.zoom_alpha,
+
+            args.zoom_start_at,
+            args.zoom_end_at,
+
+            args.zoom_pause,
+            args.zoom_active,
+            args.zoom_invert_pause
+        ),
 
         palette_filter() if splitext(args.input)[1].lower() == ".gif" else ""
     ]
@@ -92,6 +129,20 @@ def main():
 
     parser.add_argument("-rss", "--rgb-shift-start-at", type = int, nargs = "?", default = 0)
     parser.add_argument("-rse", "--rgb-shift-end-at", type = int, nargs = "?", default = UINT32_MAX)
+
+    parser.add_argument("-z", "--zoom", default = False, action = BooleanOptionalAction)
+    parser.add_argument("-zf", "--zoom-factor", type = int, nargs = "?", default = DEFAULT_ZOOM_FACTOR)
+    parser.add_argument("-zx", "--zoom-center-x", type = int, nargs = "?", default = DEFAULT_ZOOM_CENTER_X)
+    parser.add_argument("-zy", "--zoom-center-y", type = int, nargs = "?", default = DEFAULT_ZOOM_CENTER_Y)
+
+    parser.add_argument("-zl", "--zoom-alpha", type = float, nargs = "?", default = DEFAULT_ZOOM_ALPHA)
+
+    parser.add_argument("-zs", "--zoom-start-at", type = int, nargs = "?", default = 0)
+    parser.add_argument("-ze", "--zoom-end-at", type = int, nargs = "?", default = UINT32_MAX)
+
+    parser.add_argument("-za", "--zoom-active", type = int, nargs = "?", default = DEFAULT_ZOOM_PAUSE)
+    parser.add_argument("-zp", "--zoom-pause", type = int, nargs = "?", default = DEFAULT_ZOOM_PAUSE)
+    parser.add_argument("-zip", "--zoom-invert-pause", default = False, action = BooleanOptionalAction)
 
     args = parser.parse_args()
 

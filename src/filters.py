@@ -35,6 +35,40 @@ def rgbshift_filter(start_shift_at, end_shift_at, shift_intensity, shift_every):
         )}'''
     )
 
+def zoom_filter(
+    res,
+    fps,
+
+    zoom_factor,
+    zoom_center_x,
+    zoom_center_y,
+    zoom_alpha,
+
+    start_zoom_at,
+    end_zoom_at,
+
+    zoom_pause,
+    zoom_active,
+    should_invert_zoom_pause,
+):
+    return (
+        f"split[orig][to_zoom];"
+        f"[to_zoom]zoompan=s={res}:fps={fps}:"
+        f"z={zoom_factor}:d=1:"
+        f"x={zoom_center_x}/{zoom_factor}:y={zoom_center_y}/{zoom_factor}[zoomed];"
+        f"[zoomed]format=argb,colorchannelmixer=aa={zoom_alpha}[zoomed_alpha];"
+        f'''[orig][zoomed_alpha]overlay=enable={join_and(
+            enable_from(start_zoom_at),
+            enable_until(end_zoom_at),
+            enable_at_interval(
+                start_zoom_at,
+                should_invert_zoom_pause,
+                pause_interval = zoom_pause,
+                active_interval = zoom_active
+            )
+        )}'''
+    )
+
 # For GIF management ;
 # Without a separate palette for each GIF frame, noticeable quantization noise appears.
 # The optimized thing to do would be to have two palettes : one for the normal frames, one for the inverted
