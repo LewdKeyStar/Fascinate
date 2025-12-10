@@ -30,7 +30,7 @@ features: list[Feature] = [
         ),
 
         parameters = [
-            FeatureParameter("intensity", default = DEFAULT_RGB_SHIFT_INTENSITY)
+            FeatureParameter("intensity", default = DEFAULT_RGB_SHIFT_INTENSITY, unit = "px")
         ]
     ),
 
