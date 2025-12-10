@@ -1,11 +1,11 @@
 from abc import ABC
 from dataclasses import dataclass, field
 
-from src.text_utils import abbreviate
+from src.utils.text_utils import abbreviate
 
-from src.filter_enable_settings_list import settings
+from src.decl.filter_enable_settings_list import settings
 
-import src.filters
+import src.impl.feature_filters
 
 @dataclass
 class FeatureDefaultValues:
@@ -46,7 +46,7 @@ class Feature(Shortenable):
         if not getattr(args, self.name):
             return ''
 
-        return getattr(src.filters, f"{self.name}_filter")(
+        return getattr(src.impl.feature_filters, f"{self.name}_filter")(
             *supp_args,
 
             *[getattr(args, f"{self.name}_{param.name}") for param in self.parameters],

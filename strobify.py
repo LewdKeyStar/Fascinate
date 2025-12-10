@@ -1,17 +1,17 @@
 from ffmpy import FFmpeg
 from argparse import ArgumentParser
 
-from src.ffprobe_utils import (
+from src.utils.ffprobe_utils import (
     get_resolution,
     get_fps
 )
 
-from src.feature_list import features
-from src.filters import palette_filter
+from src.decl.feature_list import features
+from src.impl.misc_filters import palette_filter
 
-from src.parser_utils import register_feature
+from src.utils.parser_utils import register_feature
 
-from src.name_utils import is_gif, to_output_name
+from src.utils.name_utils import is_gif, to_output_name
 from src.constants import DEFAULT_OUTPUT
 
 def appropriate_filters(args, *, resolution, fps):

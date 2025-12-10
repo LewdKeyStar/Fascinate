@@ -1,6 +1,6 @@
 from src.constants import *
 
-from src.feature import (
+from src.types.feature import (
     Feature,
     FeatureParameter,
     FeatureDefaultValues

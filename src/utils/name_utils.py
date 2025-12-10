@@ -1,6 +1,6 @@
-from src.feature import Feature
-from src.feature_list import features
-from src.filter_enable_settings_list import settings
+from src.types.feature import Feature
+from src.decl.feature_list import features
+from src.decl.filter_enable_settings_list import settings
 
 from os.path import splitext
 from re import sub
