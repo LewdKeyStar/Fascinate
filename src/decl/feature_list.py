@@ -72,7 +72,7 @@ features: list[Feature] = [
         name = "zoom",
 
         parameters = [
-            FeatureParameter("factor", default = DEFAULT_ZOOM_FACTOR),
+            FeatureParameter("factor", default = DEFAULT_ZOOM_FACTOR, type = float),
             FeatureParameter("center_x", special_shorthand = "x", unit = "px"),
             FeatureParameter("center_y", special_shorthand = "y", unit = "px"),
             FeatureParameter(
