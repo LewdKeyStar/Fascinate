@@ -39,6 +39,36 @@ features: list[Feature] = [
     ),
 
     Feature(
+        name = "shake",
+
+        special_shorthand = "ss",
+
+        parameters = [
+            FeatureParameter(
+                "axis",
+                special_shorthand = "ax",
+                type = str,
+                default = DEFAULT_SHAKE_AXIS
+            ),
+            FeatureParameter(
+                "amplitude",
+                special_shorthand = "amp",
+                default = DEFAULT_SHAKE_AMPLITUDE,
+                unit = "px"
+            ),
+            FeatureParameter(
+                "frequency",
+                type = float,
+                default = DEFAULT_SHAKE_FREQUENCY,
+                unit = "hz"
+            ),
+            FeatureParameter("dampen", type = float, default = DEFAULT_SHAKE_DAMPEN)
+        ],
+
+        supplemental_arguments = ["fps"]
+    ),
+
+    Feature(
         name = "zoom",
 
         parameters = [

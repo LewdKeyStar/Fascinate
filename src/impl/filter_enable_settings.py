@@ -41,3 +41,17 @@ def enable_at_interval(start, should_invert, *, pause_interval, active_interval)
             f"(mod(n-{start}, {pause_interval+active_interval}),"
             f"{pause_interval if should_invert else active_interval})'"
         )
+
+# TODO : this was written *after* enable_at_interval, because of the shake filter.
+# Should rewrite enable_at_interval to use it.
+
+def interval_total_length(pause_interval, active_interval):
+
+    if pause_interval == 0:
+        return 1
+
+    elif active_interval == 0:
+        return 2*pause_interval
+
+    else:
+        return pause_interval+active_interval

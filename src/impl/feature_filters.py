@@ -52,6 +52,49 @@ def rgb_shift_filter(
         )}'''
     )
 
+def shake_filter(
+    fps,
+
+    shake_axis,
+
+    shake_amplitude,
+    shake_frequency,
+    shake_dampen,
+
+    start_shake_at,
+    end_shake_at,
+
+    shake_every,
+
+    shake_pause,
+    shake_active,
+    should_invert_shake_pause
+):
+
+    if shake_axis not in ("x", "y"):
+        return ''
+
+    def t_modulo_interval():
+        return f'mod(t-{start_shake_at/fps},{interval_total_length(shake_pause, shake_active)/fps})'
+
+    return (
+        f"split[orig][moving];"
+        f"[orig][moving]overlay={shake_axis}='"
+        f"exp(-{shake_dampen}*{t_modulo_interval()})"
+        f"*{shake_amplitude}*sin(2*PI*{shake_frequency}*{t_modulo_interval()})':"
+        f'''enable={join_and(
+            enable_from(start_shake_at),
+            enable_until(end_shake_at),
+            enable_every(start_shake_at, shake_every),
+            enable_at_interval(
+                start_shake_at,
+                should_invert_shake_pause,
+                pause_interval = shake_pause,
+                active_interval = shake_active
+            )
+        )}'''
+    )
+
 def zoom_filter(
     res,
     fps,
