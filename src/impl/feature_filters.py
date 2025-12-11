@@ -117,7 +117,7 @@ def zoom_filter(
         f"split[orig][to_zoom];"
         f"[to_zoom]zoompan=s={res}:fps={fps}:"
         f"z={zoom_factor}:d=1:"
-        f"x={zoom_center_x}/{zoom_factor}:y={zoom_center_y}/{zoom_factor}[zoomed];"
+        f"x={zoom_center_x} - {zoom_center_x}/zoom:y={zoom_center_y} - {zoom_center_y}/zoom[zoomed];"
         f"[zoomed]format=argb,colorchannelmixer=aa={zoom_alpha}[zoomed_alpha];"
         f'''[orig][zoomed_alpha]overlay=enable={join_and(
             enable_from(start_zoom_at),
