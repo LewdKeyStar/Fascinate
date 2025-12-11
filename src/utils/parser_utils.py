@@ -61,9 +61,8 @@ def register_feature(
     parser.add_argument(
         f"-{feature.shorthand}ip",
         f"--{to_kebab(feature.name)}-invert-pause",
-        type = int,
-        nargs = "?",
-        default = False
+        default = False,
+        action = BooleanOptionalAction
     )
 
     for param in feature.parameters:
