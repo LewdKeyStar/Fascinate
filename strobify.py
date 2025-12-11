@@ -16,18 +16,17 @@ from src.constants import DEFAULT_OUTPUT
 
 def appropriate_filters(args, *, resolution, fps):
 
+    # For SOME reason, this is necessary.
+    # If we call locals() in the list comprehension, it produces a KeyError,
+    # For either resolution or fps.
+
+    local_dict = locals()
+
     all_filters = [
         *[
             feature_filter(
                 args,
-                # *[locals()[supp_arg] for supp_arg in feature_filter.supplemental_arguments]
-                # ...but that doesn't work for some reason??????
-                # It produces a KeyError for "resolution" or "fps".
-                # Why????
-
-                # So I have to do this stupid shit instead...
-                # TODO : no, seriously, what the actual fuck
-                *([resolution, fps] if feature_filter.name == "zoom" else [])
+                *[local_dict[supp_arg] for supp_arg in feature_filter.supplemental_arguments]
             )
             for feature_filter in features
          ],
