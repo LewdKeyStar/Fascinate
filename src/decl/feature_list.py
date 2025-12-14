@@ -87,3 +87,13 @@ features: list[Feature] = [
         supplemental_arguments = ["resolution", "fps"]
     )
 ]
+
+# A util function that enforces the priority values given by users at call time.
+# Used for the order of feature application, and the order of feature sections in the output name.
+
+def prioritized_features(args):
+    return sorted(
+        features,
+        key = lambda f: getattr(args, f"{f.name}_priority"),
+        reverse = True
+    )

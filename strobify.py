@@ -6,7 +6,7 @@ from src.utils.ffprobe_utils import (
     get_fps
 )
 
-from src.decl.feature_list import features
+from src.decl.feature_list import features, prioritized_features
 from src.impl.misc_filters import palette_filter
 
 from src.utils.parser_utils import register_feature
@@ -28,7 +28,7 @@ def appropriate_filters(args, *, resolution, fps):
                 args,
                 *[local_dict[supp_arg] for supp_arg in feature_filter.supplemental_arguments]
             )
-            for feature_filter in features
+            for feature_filter in prioritized_features(args)
          ],
 
         palette_filter() if is_gif(args.input) else ""

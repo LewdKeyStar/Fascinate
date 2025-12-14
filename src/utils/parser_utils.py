@@ -65,6 +65,18 @@ def register_feature(
         action = BooleanOptionalAction
     )
 
+    # Feature priority is different from other arguments :
+    # It's not a setting on the filter itself,
+    # And therefore is not borne by the Feature instance or registered in the settings list.
+
+    parser.add_argument(
+        f"-{feature.shorthand}r",
+        f"--{to_kebab(feature.name)}-priority",
+        type = int,
+        nargs = "?",
+        default = 0
+    )
+
     for param in feature.parameters:
 
         parser.add_argument(

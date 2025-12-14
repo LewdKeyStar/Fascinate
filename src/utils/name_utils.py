@@ -1,5 +1,5 @@
 from src.types.feature import Feature
-from src.decl.feature_list import features
+from src.decl.feature_list import prioritized_features
 from src.decl.filter_enable_settings_list import settings
 
 from os.path import splitext
@@ -44,7 +44,7 @@ def to_output_name(args):
         "_", # with single underscores.
         "_".join([
             input_name,
-            "_".join([feature_section(args, feature) for feature in features])
+            "_".join([feature_section(args, feature) for feature in prioritized_features(args)])
         ]).rstrip("_") + input_ext
     )
 
