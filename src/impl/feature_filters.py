@@ -50,6 +50,8 @@ def shake_filter(
     if shake_axis not in ("x", "y"):
         return ''
 
+    # This single use case is the reason why ALL filters are forced to bear enable conditions.
+    # Isn't there a way to solve this??
     def t_modulo_interval():
         return f'mod(t-{start_shake_at/fps},{interval_total_length(shake_pause, shake_active)/fps})'
 

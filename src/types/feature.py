@@ -49,7 +49,7 @@ class Feature(Shortenable):
     def get_param_value(self, args, param_name):
         if param_name not in self.parameter_names:
             raise ValueError("Invalid parameter :", param_name)
-            
+
         return getattr(args, f"{self.name}_{param_name}")
 
     def get_setting_value(self, args, setting_name):
@@ -68,6 +68,12 @@ class Feature(Shortenable):
 
             *[self.get_param_value(args, param_name) for param_name in self.parameter_names],
 
+            # This is a leftover from when conditions were applied in the feature filter function.
+            # However, it remains necessary for the sake of the shake filter,
+            # Which NEEDS its start, pause and active values for the sinusoidal equation!
+            # This has the terrible consequence of requiring every other filter needlessly take its condition settings,
+            # Even if they don't use them, for the sake of interface uniformity.
+            # Yikes!
             *[self.get_setting_value(args, setting_name) for setting_name in settings.keys()]
         ) + (
             f'''enable={join_and(
