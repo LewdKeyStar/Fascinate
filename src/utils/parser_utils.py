@@ -1,6 +1,6 @@
 from argparse import BooleanOptionalAction
 
-from src.decl.filter_enable_settings_list import settings
+from src.decl.filter_settings_list import settings
 
 from src.types.Feature import Feature
 

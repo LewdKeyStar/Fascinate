@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from src.decl.filter_enable_settings_list import settings, valid_setting_names
+from src.decl.filter_settings_list import settings, valid_setting_names
 
 @dataclass
 class FeatureSettingDefaultValues:

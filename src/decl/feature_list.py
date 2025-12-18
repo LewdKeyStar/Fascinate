@@ -70,16 +70,14 @@ features: list[Feature] = [
     Feature(
         name = "zoom",
 
+        default_setting_values = FeatureSettingDefaultValues({
+            "alpha": DEFAULT_ZOOM_ALPHA
+        }),
+
         parameters = [
             FeatureParameter("factor", default = DEFAULT_ZOOM_FACTOR, type = float),
             FeatureParameter("center_x", special_shorthand = "x", unit = "px"),
-            FeatureParameter("center_y", special_shorthand = "y", unit = "px"),
-            FeatureParameter(
-                "alpha",
-                special_shorthand = "l",
-                default = DEFAULT_ZOOM_ALPHA,
-                type = float,
-            )
+            FeatureParameter("center_y", special_shorthand = "y", unit = "px")
         ],
 
         supplemental_arguments = ["resolution", "fps"]

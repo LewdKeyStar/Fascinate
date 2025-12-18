@@ -10,7 +10,7 @@ def strobe_filter(
     strobe_active,
     should_invert_strobe_pause
 ):
-    return "lutrgb=r=negval:g=negval:b=negval:"
+    return "lutrgb=r=negval:g=negval:b=negval"
 
 def rgb_shift_filter(
     shift_intensity,
@@ -24,7 +24,7 @@ def rgb_shift_filter(
     shift_active,
     should_invert_shift_pause
 ):
-    return f"rgbashift=rh={shift_intensity}:gh={-shift_intensity}:"
+    return f"rgbashift=rh={shift_intensity}:gh={-shift_intensity}"
 
 def shake_filter(
     fps,
@@ -61,7 +61,7 @@ def shake_filter(
         f":radius={shake_blur_radius}[moving_blurred];"
         f"[orig][moving_blurred]overlay={shake_axis}='"
         f"exp(-{shake_dampen}*{t_modulo_interval()})"
-        f"*{shake_amplitude}*sin(2*PI*{shake_frequency}*{t_modulo_interval()})':"
+        f"*{shake_amplitude}*sin(2*PI*{shake_frequency}*{t_modulo_interval()})'"
     )
 
 def zoom_filter(
@@ -71,7 +71,6 @@ def zoom_filter(
     zoom_factor,
     zoom_center_x,
     zoom_center_y,
-    zoom_alpha,
 
     start_zoom_at,
     end_zoom_at,
@@ -83,12 +82,9 @@ def zoom_filter(
     should_invert_zoom_pause,
 ):
     return (
-        f"split[orig][to_zoom];"
-        f"[to_zoom]zoompan=s={res}:fps={fps}:"
+        f"zoompan=s={res}:fps={fps}:"
         f"z={zoom_factor}:d=1:"
-        f"x={zoom_center_x} - {zoom_center_x}/zoom:y={zoom_center_y} - {zoom_center_y}/zoom[zoomed];"
-        f"[zoomed]format=argb,colorchannelmixer=aa={zoom_alpha}[zoomed_alpha];"
-        f'''[orig][zoomed_alpha]overlay=''' # On purpose : enable option provided by feature call.
+        f"x={zoom_center_x} - {zoom_center_x}/zoom:y={zoom_center_y} - {zoom_center_y}/zoom"
     )
 
 def frame_randomizer_filter(
@@ -105,8 +101,6 @@ def frame_randomizer_filter(
     should_invert_frame_randomizer_pause
 ):
     return (
-        f"split[orig][to_randomize];"
-        f"[to_randomize]random=frames={frame_randomizer_max_frames}:"
-        f"seed={frame_randomizer_seed}[randomized];"
-        f"[orig][randomized]overlay="
+        f"random=frames={frame_randomizer_max_frames}:"
+        f"seed={frame_randomizer_seed}"
     )

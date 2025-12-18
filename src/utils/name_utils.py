@@ -1,6 +1,6 @@
 from src.types.Feature import Feature
 from src.decl.feature_list import prioritized_features
-from src.decl.filter_enable_settings_list import settings
+from src.decl.filter_settings_list import settings
 
 from os.path import splitext
 from re import sub

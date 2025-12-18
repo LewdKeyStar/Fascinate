@@ -4,3 +4,20 @@
 
 def palette_filter():
     return "split[s0][s1];[s0]palettegen=stats_mode=single[p];[s1][p]paletteuse=new=1"
+
+def split_filter(primary_name, secondary_name):
+    return f"split[{primary_name}][{secondary_name}];"
+
+def alpha_filter(alpha, primary_name, to_alpha_name):
+    return (
+        f"[{to_alpha_name}]format=argb,colorchannelmixer=aa={alpha}[alpha];"
+        f"[{primary_name}][alpha]overlay=" # On purpose : enable option provided by feature call.
+    )
+
+# Okay, this isn't technically a filter, but we don't need a filter_utils file for this.
+
+def filter_input(input_name):
+    return f"[{input_name}]"
+
+def filter_output(output_name):
+    return f"[{output_name}];"

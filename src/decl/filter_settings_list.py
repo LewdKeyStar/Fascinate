@@ -6,7 +6,7 @@ from src.types.FeatureSetting import FeatureSetting
 # And the respective conditions for which they are considered "active".
 # For use in output naming and reflective feature calls.
 
-settings: list[FeatureSetting] = [
+enable_settings: list[FeatureSetting] = [
     FeatureSetting(
         name = "start_at",
         active_condition = lambda x: x > 0,
@@ -44,5 +44,16 @@ settings: list[FeatureSetting] = [
         default = False
     )
 ]
+
+video_settings: list[FeatureSetting] = [
+    FeatureSetting(
+        name = "alpha",
+        type = float,
+        special_shorthand = "l",
+        default = 1.0
+    )
+]
+
+settings = enable_settings + video_settings
 
 valid_setting_names = [setting.name for setting in settings]

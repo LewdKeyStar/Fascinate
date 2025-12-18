@@ -4,9 +4,17 @@ from src.types.abstract.Shortenable import Shortenable
 from src.types.FeatureSettingDefaultValues import FeatureSettingDefaultValues
 from src.types.FeatureParameter import FeatureParameter
 
-from src.decl.filter_enable_settings_list import settings, valid_setting_names
+from src.decl.filter_settings_list import enable_settings, valid_setting_names
 
 import src.impl.feature_filters
+from src.impl.misc_filters import (
+    split_filter,
+    alpha_filter,
+
+    filter_input,
+    filter_output
+)
+
 from src.impl.filter_enable_settings import *
 
 @dataclass
@@ -18,6 +26,10 @@ class Feature(Shortenable):
     parameters: list[FeatureParameter] = field(default_factory=list)
 
     supplemental_arguments: list[str] = field(default_factory=list)
+
+    @property
+    def feature_filter(self):
+        return getattr(src.impl.feature_filters, f"{self.name}_filter")
 
     @property
     def parameter_names(self):
@@ -43,24 +55,24 @@ class Feature(Shortenable):
 
         return getattr(args, f"{self.name}_{setting_name}")
 
-    def __call__(self, args, *supp_args):
+    # I don't particularly like having ffmpeg-related strings in this submodule.
+    # They're not *technically* part of the FFMPEG filtergraph, but...still.
+    # It's out of place.
 
-        if not getattr(args, self.name):
-            return ''
+    @property
+    def filterstr_before_feature(self):
+        return f"before_{self.name}"
 
-        return getattr(src.impl.feature_filters, f"{self.name}_filter")(
-            *supp_args,
+    @property
+    def filterstr_before_alpha(self):
+        return f"{self.name}_before_alpha"
 
-            *[self.get_param_value(args, param_name) for param_name in self.parameter_names],
+    @property
+    def filterstr_to_alpha(self):
+        return f"{self.name}_to_alpha"
 
-            # This is a leftover from when conditions were applied in the feature filter function.
-            # However, it remains necessary for the sake of the shake filter,
-            # Which NEEDS its start, pause and active values for the sinusoidal equation!
-            # This has the terrible consequence of requiring every other filter needlessly take its condition settings,
-            # Even if they don't use them, for the sake of interface uniformity.
-            # Yikes!
-            *[self.get_setting_value(args, setting.name) for setting in settings]
-        ) + (
+    def enable_conditions(self, args):
+        return (
             f'''enable={join_and(
                 enable_from(self.get_setting_value(args, "start_at")),
                 enable_until(self.get_setting_value(args, "end_at")),
@@ -75,4 +87,52 @@ class Feature(Shortenable):
                     active_interval = self.get_setting_value(args, "active")
                 )
             )}'''
+        )
+
+    # TODO : maybe we'll generalize this too.
+
+    def apply_alpha(self, args, feature_filterstr):
+        return (
+            split_filter(
+                self.filterstr_before_feature,
+                self.filterstr_before_alpha
+            )
+            + filter_input(self.filterstr_before_alpha)
+            + feature_filterstr
+            + filter_output(self.filterstr_to_alpha)
+            + alpha_filter(
+                self.get_setting_value(args, "alpha"),
+                self.filterstr_before_feature,
+                self.filterstr_to_alpha
+            )
+        )
+
+    def __call__(self, args, *supp_args):
+
+        if not getattr(args, self.name):
+            return ''
+
+        feature_filterstr = self.feature_filter(
+            *supp_args,
+
+            *[self.get_param_value(args, param_name) for param_name in self.parameter_names],
+
+            # This is a leftover from when conditions were applied in the feature filter function.
+            # However, it remains necessary for the sake of the shake filter,
+            # Which NEEDS its start, pause and active values for the sinusoidal equation!
+            # This has the terrible consequence of requiring every other filter needlessly take its condition settings,
+            # Even if they don't use them, for the sake of interface uniformity.
+            # Yikes!
+            *[self.get_setting_value(args, setting.name) for setting in enable_settings]
+        )
+
+        return (
+            self.apply_alpha(
+                args,
+                feature_filterstr
+            )
+            +
+            self.enable_conditions(
+                args
+            )
         )
