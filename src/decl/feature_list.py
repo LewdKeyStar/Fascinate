@@ -10,6 +10,17 @@ from src.types.FeatureSettingDefaultValues import FeatureSettingDefaultValues
 
 features: list[Feature] = [
     Feature(
+        name = "frame_randomizer",
+
+        combine_mode = "overlay",
+
+        parameters = [
+            FeatureParameter("max_frames", special_shorthand = "max", default = DEFAULT_RANDOMIZER_MAX_FRAMES),
+            FeatureParameter("seed", special_shorthand = "sd")
+        ]
+    ),
+    
+    Feature(
         name = "strobe",
         special_shorthand = "", # TODO : this is done for ease on the options,
         # but in practice it also means there is an option called "-" !
@@ -83,17 +94,6 @@ features: list[Feature] = [
         ],
 
         supplemental_arguments = ["resolution", "fps"]
-    ),
-
-    Feature(
-        name = "frame_randomizer",
-
-        combine_mode = "overlay",
-
-        parameters = [
-            FeatureParameter("max_frames", special_shorthand = "max", default = DEFAULT_RANDOMIZER_MAX_FRAMES),
-            FeatureParameter("seed", special_shorthand = "sd")
-        ]
     )
 ]
 
