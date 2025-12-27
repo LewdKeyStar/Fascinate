@@ -1,6 +1,8 @@
 from src.impl.filter_enable_settings import interval_total_length
 
 def strobe_filter(
+    strobe_gamma,
+
     start_strobe_at,
     end_strobe_at,
 
@@ -10,7 +12,10 @@ def strobe_filter(
     strobe_active,
     should_invert_strobe_pause
 ):
-    return "lutrgb=r=negval:g=negval:b=negval"
+    return (
+        "lutrgb=r=negval:g=negval:b=negval[to_gamma];"
+        f"[to_gamma]lutrgb=r=gammaval({strobe_gamma}):g=gammaval({strobe_gamma}):b=gammaval({strobe_gamma})"
+    )
 
 def rgb_shift_filter(
     shift_intensity,

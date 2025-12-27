@@ -19,7 +19,7 @@ features: list[Feature] = [
             FeatureParameter("seed", special_shorthand = "sd")
         ]
     ),
-    
+
     Feature(
         name = "strobe",
         special_shorthand = "", # TODO : this is done for ease on the options,
@@ -30,6 +30,10 @@ features: list[Feature] = [
             "every": DEFAULT_STROBE_EVERY,
             "pause": DEFAULT_STROBE_PAUSE
         }),
+
+        parameters = [
+            FeatureParameter("gamma", type = float, default = DEFAULT_STROBE_GAMMA)
+        ],
 
         enable_default = True
     ),

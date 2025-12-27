@@ -1,5 +1,6 @@
 DEFAULT_OUTPUT = "default" # This is just a placeholder, not an actual filename.
 
+DEFAULT_STROBE_GAMMA = 1.0
 DEFAULT_STROBE_EVERY = 2
 DEFAULT_STROBE_PAUSE = 0
 
