@@ -31,7 +31,7 @@ def appropriate_filters(args, *, resolution, fps):
             for feature_filter in prioritized_features(args)
          ],
 
-        palette_filter() if is_gif(args.input) else ""
+        palette_filter() if is_gif(args.output) else ""
     ]
 
     return ",".join([
