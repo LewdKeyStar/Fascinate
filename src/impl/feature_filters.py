@@ -13,10 +13,10 @@ def strobe_filter(
     strobe_active,
     should_invert_strobe_pause
 ):
-    return (
-        "lutrgb=r=negval:g=negval:b=negval[to_gamma];"
-        f"[to_gamma]lutrgb=r=gammaval({strobe_gamma}):g=gammaval({strobe_gamma}):b=gammaval({strobe_gamma})"
-    )
+
+    gamma_negval = f"pow((negval-minval)/(maxval-minval)\,{strobe_gamma})*(maxval-minval)+minval"
+
+    return f"lutrgb=r={gamma_negval}:g={gamma_negval}:b={gamma_negval}"
 
 def rgb_shift_filter(
     shift_axis,
