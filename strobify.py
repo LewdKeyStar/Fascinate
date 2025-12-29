@@ -1,10 +1,7 @@
 from ffmpy import FFmpeg
 from argparse import ArgumentParser
 
-from src.utils.ffprobe_utils import (
-    get_resolution,
-    get_fps
-)
+from src.types.VideoInfo import VideoInfo
 
 from src.decl.feature_list import features, prioritized_features
 from src.impl.misc_filters import palette_filter
@@ -14,19 +11,13 @@ from src.utils.parser_utils import register_feature
 from src.utils.name_utils import is_gif, to_output_name
 from src.constants import DEFAULT_OUTPUT
 
-def appropriate_filters(args, *, resolution, fps):
-
-    # For SOME reason, this is necessary.
-    # If we call locals() in the list comprehension, it produces a KeyError,
-    # For either resolution or fps.
-
-    local_dict = locals()
-
+def appropriate_filters(args, *, video_info):
+    
     all_filters = [
         *[
             feature_filter(
                 args,
-                *[local_dict[supp_arg] for supp_arg in feature_filter.supplemental_arguments]
+                video_info
             )
             for feature_filter in prioritized_features(args)
          ],
@@ -65,8 +56,7 @@ def main():
             # because there is no way for ffmpeg to reference the input codec in the filter chain...
             "-vf", appropriate_filters(
                 args,
-                resolution = get_resolution(args.input),
-                fps = get_fps(args.input)
+                video_info = VideoInfo(args.input)
             )
         ]}
     )

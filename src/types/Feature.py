@@ -27,7 +27,7 @@ class Feature(Shortenable):
     default_setting_values: FeatureSettingDefaultValues = FeatureSettingDefaultValues()
     parameters: list[FeatureParameter] = field(default_factory=list)
 
-    supplemental_arguments: list[str] = field(default_factory=list)
+    required_video_information: list[str] = field(default_factory=list)
 
     combine_mode: str = "merge"
 
@@ -119,13 +119,13 @@ class Feature(Shortenable):
             )
         )
 
-    def __call__(self, args, *supp_args):
+    def __call__(self, args, video_info):
 
         if not getattr(args, self.name):
             return ''
 
         feature_filterstr = self.feature_filter(
-            *supp_args,
+            *[getattr(video_info, required_info) for required_info in self.required_video_information],
 
             *[self.get_param_value(args, param_name) for param_name in self.parameter_names],
 
