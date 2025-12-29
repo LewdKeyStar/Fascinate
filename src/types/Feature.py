@@ -76,7 +76,7 @@ class Feature(Shortenable):
     def filterstr_to_alpha(self):
         return f"{self.name}_to_alpha"
 
-    def enable_conditions(self, args):
+    def enable_conditions(self, args, video_info):
         return (
             f'''enable={join_and(
                 enable_from(self.get_setting_value(args, "start_at")),
@@ -88,8 +88,15 @@ class Feature(Shortenable):
                 enable_at_interval(
                     self.get_setting_value(args, "start_at"),
                     self.get_setting_value(args, "invert_pause"),
-                    pause_interval = self.get_setting_value(args, "pause"),
-                    active_interval = self.get_setting_value(args, "active")
+                    self.get_setting_value(args, "pause"),
+                    self.get_setting_value(args, "active")
+                ) if self.get_setting_value(args, "bpm") == 0
+                else sync_with_bpm(
+                    self.get_setting_value(args, "bpm"),
+                    self.get_setting_value(args, "bpm_active_percent"),
+                    video_info.fps,
+                    self.get_setting_value(args, "start_at"),
+                    self.get_setting_value(args, "invert_pause")
                 )
             )}'''
         )
@@ -140,6 +147,7 @@ class Feature(Shortenable):
             )
             +
             self.enable_conditions(
-                args
+                args,
+                video_info
             )
         )

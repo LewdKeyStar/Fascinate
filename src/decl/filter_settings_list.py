@@ -42,6 +42,29 @@ enable_settings: list[FeatureSetting] = [
         type = bool,
         active_condition = lambda x: x,
         default = False
+    ),
+
+    # If a syncing BPM is provided, the "pause" and "active" options are ignored.
+
+    # FIXME : This is not very clean ; ideally it should be impossible to provided them together.
+    # However argparse has deprecated nesting argument groups, such that something like :
+    # [[-p -a] | [-bpm -bap]]
+    # Cannot be done.
+    # The only alternative would be subcommands :
+    # strobify [pause-mode [-p -a] | bpm-mode [-bpm -bap]]
+    # which is not feasible since the same "subcommand" could be invoked multiple times, one for each filter...
+
+    FeatureSetting(
+        name = "bpm",
+        special_shorthand = "bpm",
+        type = float,
+        active_condition = lambda x: x > 0
+    ),
+
+    FeatureSetting(
+        name = "bpm_active_percent",
+        type = float,
+        active_condition = lambda x: x > 0
     )
 ]
 
