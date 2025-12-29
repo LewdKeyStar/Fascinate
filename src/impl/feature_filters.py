@@ -2,16 +2,7 @@ from src.impl.filter_enable_settings import interval_total_length
 from src.constants import VALID_AXES, VALID_COLORS
 
 def strobe_filter(
-    strobe_gamma,
-
-    start_strobe_at,
-    end_strobe_at,
-
-    strobe_every,
-
-    strobe_pause,
-    strobe_active,
-    should_invert_strobe_pause
+    strobe_gamma
 ):
 
     gamma_negval = f"pow((negval-minval)/(maxval-minval)\,{strobe_gamma})*(maxval-minval)+minval"
@@ -21,16 +12,7 @@ def strobe_filter(
 def rgb_shift_filter(
     shift_axis,
     shift_intensity,
-    shift_colors,
-
-    start_shift_at,
-    end_shift_at,
-
-    shift_every,
-
-    shift_pause,
-    shift_active,
-    should_invert_shift_pause
+    shift_colors
 ):
     if shift_axis not in VALID_AXES:
         raise ValueError("Invalid axis :", shift_axis)
@@ -58,13 +40,9 @@ def shake_filter(
     shake_blur_radius,
 
     start_shake_at,
-    end_shake_at,
-
-    shake_every,
 
     shake_pause,
     shake_active,
-    should_invert_shake_pause
 ):
 
     if shake_axis not in VALID_AXES:
@@ -90,16 +68,7 @@ def zoom_filter(
 
     zoom_factor,
     zoom_center_x,
-    zoom_center_y,
-
-    start_zoom_at,
-    end_zoom_at,
-
-    zoom_every,
-
-    zoom_pause,
-    zoom_active,
-    should_invert_zoom_pause,
+    zoom_center_y
 ):
     return (
         f"zoompan=s={res}:fps={fps}:"
@@ -109,16 +78,7 @@ def zoom_filter(
 
 def frame_randomizer_filter(
     frame_randomizer_max_frames,
-    frame_randomizer_seed,
-
-    start_frame_randomizer_at,
-    end_frame_randomizer_at,
-
-    frame_randomizer_every,
-
-    frame_randomizer_pause,
-    frame_randomizer_active,
-    should_invert_frame_randomizer_pause
+    frame_randomizer_seed
 ):
     return (
         f"random=frames={frame_randomizer_max_frames}:"

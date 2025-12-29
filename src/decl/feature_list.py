@@ -94,7 +94,8 @@ features: list[Feature] = [
             FeatureParameter("blur_radius", type = int, default = DEFAULT_SHAKE_BLUR)
         ],
 
-        required_video_information = ["fps"]
+        video_info_used_in_filter = ["fps"],
+        settings_used_in_filter = ["start_at", "pause", "active"]
     ),
 
     Feature(
@@ -112,7 +113,7 @@ features: list[Feature] = [
             FeatureParameter("center_y", special_shorthand = "y", unit = "px")
         ],
 
-        required_video_information = ["resolution", "fps"]
+        video_info_used_in_filter = ["resolution", "fps"]
     )
 ]
 

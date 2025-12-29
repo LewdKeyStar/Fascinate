@@ -27,7 +27,8 @@ class Feature(Shortenable):
     default_setting_values: FeatureSettingDefaultValues = FeatureSettingDefaultValues()
     parameters: list[FeatureParameter] = field(default_factory=list)
 
-    required_video_information: list[str] = field(default_factory=list)
+    video_info_used_in_filter: list[str] = field(default_factory=list)
+    settings_used_in_filter: list[str] = field(default_factory=list)
 
     combine_mode: str = "merge"
 
@@ -125,17 +126,11 @@ class Feature(Shortenable):
             return ''
 
         feature_filterstr = self.feature_filter(
-            *[getattr(video_info, required_info) for required_info in self.required_video_information],
+            *[getattr(video_info, required_info) for required_info in self.video_info_used_in_filter],
 
             *[self.get_param_value(args, param_name) for param_name in self.parameter_names],
 
-            # This is a leftover from when conditions were applied in the feature filter function.
-            # However, it remains necessary for the sake of the shake filter,
-            # Which NEEDS its start, pause and active values for the sinusoidal equation!
-            # This has the terrible consequence of requiring every other filter needlessly take its condition settings,
-            # Even if they don't use them, for the sake of interface uniformity.
-            # Yikes!
-            *[self.get_setting_value(args, setting.name) for setting in enable_settings]
+            *[self.get_setting_value(args, setting_name) for setting_name in self.settings_used_in_filter]
         )
 
         return (
