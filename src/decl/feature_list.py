@@ -2,6 +2,7 @@ from src.constants import *
 
 from src.types.Feature import Feature
 from src.types.FeatureParameter import FeatureParameter
+from src.types.FeatureParameterRange import FeatureParameterRange
 from src.types.FeatureSettingDefaultValues import FeatureSettingDefaultValues
 from src.types.FeatureCombineMode import FeatureCombineMode
 
@@ -143,7 +144,12 @@ features: list[Feature] = [
         }),
 
         parameters = [
-            FeatureParameter("factor", default = DEFAULT_ZOOM_FACTOR, type = float),
+            FeatureParameter(
+                "factor",
+                default = DEFAULT_ZOOM_FACTOR,
+                type = float,
+                range = FeatureParameterRange(1.0, 10.0)
+            ),
             FeatureParameter("center_x", special_shorthand = "x", unit = "px"),
             FeatureParameter("center_y", special_shorthand = "y", unit = "px")
         ],
