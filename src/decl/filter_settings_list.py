@@ -51,7 +51,7 @@ enable_settings: list[FeatureSetting] = [
     # [[-p -a] | [-bpm -bap]]
     # Cannot be done.
     # The only alternative would be subcommands :
-    # strobify [pause-mode [-p -a] | bpm-mode [-bpm -bap]]
+    # fascinate [pause-mode [-p -a] | bpm-mode [-bpm -bap]]
     # which is not feasible since the same "subcommand" could be invoked multiple times, one for each filter...
 
     FeatureSetting(
