@@ -61,21 +61,16 @@ features: list[Feature] = [
     ),
 
     Feature(
-        name = "strobe",
-        special_shorthand = "", # TODO : this is done for ease on the options,
-        # but in practice it also means there is an option called "-" !
-        # I'm not sure how valid that is
+        name = "invert",
 
         default_setting_values = FeatureSettingDefaultValues({
-            "every": DEFAULT_STROBE_EVERY,
-            "pause": DEFAULT_STROBE_PAUSE
+            "every": DEFAULT_INVERT_EVERY,
+            "pause": DEFAULT_INVERT_PAUSE
         }),
 
         parameters = [
-            FeatureParameter("gamma", type = float, default = DEFAULT_STROBE_GAMMA)
-        ],
-
-        enable_default = True
+            FeatureParameter("gamma", type = float, default = DEFAULT_INVERT_GAMMA)
+        ]
     ),
 
     Feature(

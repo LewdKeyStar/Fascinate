@@ -24,7 +24,7 @@ from src.impl.filter_enable_settings import *
 class Feature(Shortenable):
     name: str
 
-    enable_default: bool = False
+    enable_default: bool = False # Now that the invert feature is no longer enabled by default, this goes unused.
 
     has_audio_component: bool = False
 

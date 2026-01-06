@@ -2,11 +2,11 @@ from src.impl.filter_enable_settings import interval_total_length
 from src.constants import VALID_AXES, VALID_COLORS, TRANSPARENT_FFMPEG_COLOR
 from src.impl.misc_filters import yuva420p_format_filter
 
-def strobe_filter(
-    strobe_gamma
+def invert_filter(
+    invert_gamma
 ):
 
-    gamma_negval = f"pow((negval-minval)/(maxval-minval)\,{strobe_gamma})*(maxval-minval)+minval"
+    gamma_negval = f"pow((negval-minval)/(maxval-minval)\,{invert_gamma})*(maxval-minval)+minval"
 
     return f"lutrgb=r={gamma_negval}:g={gamma_negval}:b={gamma_negval}"
 

@@ -44,6 +44,9 @@ def appropriate_filter_audio_components(args, video_info):
 
     return chain_filters(all_audio_components)
 
+def any_filters_enabled(args):
+    return any(feature.is_enabled(args) for feature in features)
+
 def any_audio_filters_enabled(args):
     return any(feature.has_audio_component and feature.is_enabled(args) for feature in features)
 
@@ -57,6 +60,10 @@ def main():
         register_feature(parser, feature)
 
     args = parser.parse_args()
+
+    if not any_filters_enabled(args):
+        print("No filters specified, exiting")
+        return
 
     # This has to be done because there is no way to pass a default value generator
     # To ArgumentParser ; only constant values.
