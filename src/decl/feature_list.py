@@ -227,14 +227,21 @@ features: list[Feature] = [
             FeatureParameter(
                 "center_x",
                 special_shorthand = "x",
+                type = float,
                 unit = "px",
                 default = DEFAULT_ZOOM_CENTER_X
             ),
             FeatureParameter(
                 "center_y",
                 special_shorthand = "y",
+                type = float,
                 unit = "px",
                 default = DEFAULT_ZOOM_CENTER_Y
+            ),
+            FeatureParameter(
+                "relative_mode",
+                type = bool,
+                default = DEFAULT_ZOOM_RELATIVE_MODE
             )
         ],
 

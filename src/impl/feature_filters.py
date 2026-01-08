@@ -67,15 +67,21 @@ def zoom_filter(
     zoom_center_x,
     zoom_center_y,
 
+    zoom_relative_mode,
+
     res,
     fps
 ):
 
     if zoom_center_x == DEFAULT_ZOOM_CENTER_X:
-        zoom_center_x = "(iw / 2)"
+        zoom_center_x = "(iw / 2)" if not zoom_relative_mode else 0.5
 
     if zoom_center_y == DEFAULT_ZOOM_CENTER_Y:
-        zoom_center_y = "(ih / 2)"
+        zoom_center_y = "(ih / 2)" if not zoom_relative_mode else 0.5
+
+    if zoom_relative_mode:
+        zoom_center_x = f"({str(zoom_center_x)}*iw)"
+        zoom_center_y = f"({str(zoom_center_y)}*ih)"
 
     return (
         f"zoompan=s={res}:fps={fps}:"
