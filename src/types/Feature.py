@@ -5,20 +5,29 @@ from src.types.settings.FeatureSettingDefaultValues import FeatureSettingDefault
 from src.types.parameters.FeatureParameter import FeatureParameter
 from src.types.FeatureCombineMode import FeatureCombineMode
 
-from src.decl.filter_settings_list import enable_settings, valid_setting_names
+from src.decl.filter_settings_list import (
+    enable_settings,
+    video_settings,
+    valid_setting_names,
+    valid_video_setting_names
+)
 
 import src.impl.feature_filters
+import src.impl.filter_video_settings
+from src.impl.filter_enable_settings import * # TODO : automate those too through the same kind of list iteration
+
 from src.impl.misc_filters import (
     split_filter,
-    alpha_filter
+    overlay_filter
 )
 from src.utils.filter_utils import (
     filter_input,
     filter_output,
-    filter_option_separator
+    filter_option_separator,
+    filter_separator
 )
 
-from src.impl.filter_enable_settings import *
+from src.utils.misc_utils import array_find
 
 @dataclass
 class Feature(Shortenable):
@@ -106,21 +115,31 @@ class Feature(Shortenable):
 
         return getattr(args, f"{self.name}_{setting_name}")
 
+    def video_setting_filter(self, setting_name):
+        if setting_name not in valid_video_setting_names:
+            raise ValueError("Invalid video setting :", setting_name)
+
+        return getattr(src.impl.filter_video_settings, f"{setting_name}_filter")
+
     # I don't particularly like having ffmpeg-related strings in this submodule.
     # They're not *technically* part of the FFMPEG filtergraph, but...still.
     # It's out of place.
 
     @property
-    def filterstr_before_feature(self):
+    def filter_io_label_before_feature(self):
         return f"before_{self.name}"
 
     @property
-    def filterstr_before_alpha(self):
-        return f"{self.name}_before_alpha"
+    def filter_io_label_to_feature(self):
+        return f"to_{self.name}"
 
     @property
-    def filterstr_to_alpha(self):
-        return f"{self.name}_to_alpha"
+    def filter_io_label_to_video_effects(self):
+        return f"{self.name}_to_video_effects"
+
+    @property
+    def filter_io_label_after_video_effects(self):
+        return f"{self.name}_after_video_effects"
 
     def feature_filterstr(self, args, video_info, audio = False):
 
@@ -166,42 +185,90 @@ class Feature(Shortenable):
             )}'''
         )
 
-    def should_skip_alpha(self, args):
+    def should_apply_alpha(self, args):
 
         return (
-            self.combine_mode in (FeatureCombineMode.REPLACE, FeatureCombineMode.PRE_MERGED)
-            or
-            self.combine_mode == FeatureCombineMode.MERGE and self.get_setting_value(args, "alpha") == 1.0
+            (self.combine_mode not in (FeatureCombineMode.REPLACE, FeatureCombineMode.PRE_MERGED))
+            and
+            (self.combine_mode != FeatureCombineMode.MERGE or self.get_setting_value(args, "alpha") != 1.0)
         )
 
-    def feature_filterstr_without_alpha(self, args, video_info):
+    def apply_video_settings(self, filterstr, args, video_info):
+
+        if not self.can_receive_video_settings:
+            return filterstr
+
+        # Alpha should not always be applied, even if it appears in settings.
+
+        alpha_setting = array_find(video_settings, lambda setting: setting.name == "alpha")
+        alpha_setting.enabled = self.should_apply_alpha
+
+        # Surprisingly, this argument bait and switch works.
+        # Thank the Devil for dynamic typing :)
+
+        enabled_video_settings = [
+            setting for setting in video_settings
+            if setting.enabled(
+                self.get_setting_value(args, setting.name)
+                if setting.name != "alpha"
+                else args
+            )
+        ]
+
+        def should_apply_overlay_affixes():
+            return any([setting.requires_overlay for setting in enabled_video_settings])
+
+        if should_apply_overlay_affixes():
+            filterstr = filter_separator(named_io = True).join([
+                split_filter(
+                    self.filter_io_label_before_feature,
+                    self.filter_io_label_to_feature
+                ),
+                (
+                    filter_input(self.filter_io_label_to_feature)
+                    + filterstr
+                )
+             ])
+
+        for video_setting in enabled_video_settings:
+            filterstr = filter_separator(named_io = False).join([
+                filterstr,
+                self.video_setting_filter(video_setting.name)(
+                    *[self.get_setting_value(args, video_setting.name)],
+
+                    *[
+                        self.get_setting_value(
+                            args, required_enable_setting_name
+                        )
+                        for required_enable_setting_name in video_setting.enable_settings_used_in_setting_filter
+                    ],
+
+                    *[
+                        getattr(video_info, required_info)
+                        for required_info in video_setting.video_info_used_in_setting_filter
+                    ]
+                )
+            ])
+
+        if should_apply_overlay_affixes():
+            filterstr = filter_separator(named_io = True).join([
+                (
+                    filterstr
+                    + filter_output(self.filter_io_label_after_video_effects)
+                ),
+                overlay_filter(
+                    self.filter_io_label_before_feature,
+                    self.filter_io_label_after_video_effects
+                )
+            ])
+
         return (
-            self.feature_filterstr(
-                args,
-                video_info
-            )
-            +
-            filter_option_separator(
-                is_first_option = self.combine_mode == FeatureCombineMode.PRE_MERGED
-            )
-        )
-
-    def feature_filterstr_with_alpha(self, args, video_info):
-
-        alpha = self.get_setting_value(args, "alpha")
-
-        return (
-            split_filter(
-                self.filterstr_before_feature,
-                self.filterstr_before_alpha
-            )
-            + filter_input(self.filterstr_before_alpha)
-            + self.feature_filterstr(args, video_info)
-            + filter_output(self.filterstr_to_alpha)
-            + alpha_filter(
-                alpha,
-                self.filterstr_before_feature,
-                self.filterstr_to_alpha
+            filterstr
+            + filter_option_separator(
+                is_first_option = (
+                    self.combine_mode == FeatureCombineMode.PRE_MERGED
+                    or should_apply_overlay_affixes()
+                )
             )
         )
 
@@ -209,12 +276,8 @@ class Feature(Shortenable):
 
         return (
             (
-                self.feature_filterstr_with_alpha(
-                    args,
-                    video_info
-                )
-                if not self.should_skip_alpha(args)
-                else self.feature_filterstr_without_alpha(
+                self.apply_video_settings(
+                    self.feature_filterstr(args, video_info),
                     args,
                     video_info
                 )
@@ -225,8 +288,6 @@ class Feature(Shortenable):
                     args,
                     video_info
                 )
-                if self.can_receive_enable_settings
-                else ''
             )
         )
 

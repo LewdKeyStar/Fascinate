@@ -19,7 +19,7 @@ def feature_section(
 
         return (
             "_".join([f"{setting.name}", f"{setting_value}"])
-            if setting.active_condition(setting_value)
+            if setting.include_in_filename(setting_value)
             else ''
         )
 

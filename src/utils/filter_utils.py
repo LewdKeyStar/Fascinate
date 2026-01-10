@@ -2,7 +2,10 @@ def filter_input(input_name):
     return f"[{input_name}]"
 
 def filter_output(output_name):
-    return f"[{output_name}];"
+    return f"[{output_name}]"
+
+def filter_separator(named_io):
+    return ";" if named_io else ","
 
 def filter_option_separator(is_first_option):
     return "=" if is_first_option else ":"

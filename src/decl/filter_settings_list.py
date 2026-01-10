@@ -10,38 +10,38 @@ from src.types.settings.FeatureVideoSetting import FeatureVideoSetting
 enable_settings: list[FeatureEnableSetting] = [
     FeatureEnableSetting(
         name = "start_at",
-        active_condition = lambda x: x > 0,
+        include_in_filename = lambda x: x > 0,
         special_shorthand = "s"
     ),
 
     FeatureEnableSetting(
         name = "end_at",
-        active_condition = lambda x: x < UINT32_MAX,
+        include_in_filename = lambda x: x < UINT32_MAX,
         special_shorthand = "e",
         default = UINT32_MAX
     ),
 
     FeatureEnableSetting(
         name = "every",
-        active_condition = lambda x: x > 1,
+        include_in_filename = lambda x: x > 1,
         special_shorthand = "n",
         default = 1
     ),
 
     FeatureEnableSetting(
         name = "pause",
-        active_condition = lambda x: x > 0
+        include_in_filename = lambda x: x > 0
     ),
 
     FeatureEnableSetting(
         name = "active",
-        active_condition = lambda x: x > 0
+        include_in_filename = lambda x: x > 0
     ),
 
     FeatureEnableSetting(
         name = "invert_pause",
         type = bool,
-        active_condition = lambda x: x,
+        include_in_filename = lambda x: x,
         default = False
     ),
 
@@ -59,26 +59,50 @@ enable_settings: list[FeatureEnableSetting] = [
         name = "bpm",
         special_shorthand = "bpm",
         type = float,
-        active_condition = lambda x: x > 0
+        include_in_filename = lambda x: x > 0
     ),
 
     FeatureEnableSetting(
         name = "bpm_active_percent",
         type = float,
-        active_condition = lambda x: x > 0
+        include_in_filename = lambda x: x > 0
     )
 ]
 
 video_settings: list[FeatureVideoSetting] = [
     FeatureVideoSetting(
         name = "alpha",
-        requires_formatting = True,
-        type = float,
         special_shorthand = "l",
-        default = 1.0
+        type = float,
+
+        requires_overlay = True,
+
+        default = 1.0,
+        include_in_filename = lambda x: x < 1.0
+    ),
+
+    FeatureVideoSetting(
+        name = "fade_in",
+        include_in_filename = lambda x: x > 0,
+
+        requires_overlay = True,
+
+        enable_settings_used_in_setting_filter = ["start_at"],
+        video_info_used_in_setting_filter = ["duration"]
+    ),
+
+    FeatureVideoSetting(
+        name = "fade_out",
+        include_in_filename = lambda x: x > 0,
+
+        requires_overlay = True,
+
+        enable_settings_used_in_setting_filter = ["end_at"],
+        video_info_used_in_setting_filter = ["duration"]
     )
 ]
 
 settings = enable_settings + video_settings
 
 valid_setting_names = [setting.name for setting in settings]
+valid_video_setting_names = [setting.name for setting in video_settings]
