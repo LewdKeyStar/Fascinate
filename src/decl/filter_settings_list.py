@@ -67,7 +67,12 @@ enable_settings: list[FeatureEnableSetting] = [
     FeatureEnableSetting(
         name = "bpm_active_percent",
         type = float,
-        include_in_filename = lambda x: x > 0
+        include_in_filename = lambda x: x > 0,
+        range = FeatureSettingRange(0.0, 1.0)
+        # Although this is "valid" as zero by default,
+        # It means that without providing an active percent,
+        # The active interval is 0, which means an equal pause and active interval,
+        # And thus an activation every other beat
     )
 ]
 
