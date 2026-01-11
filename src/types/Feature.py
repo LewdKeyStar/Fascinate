@@ -120,6 +120,12 @@ class Feature(Shortenable):
 
         return getattr(args, f"{self.name}_{setting_name}")
 
+    def override_setting_value(self, args, setting_name, setting_value):
+        if setting_name not in valid_setting_names:
+            raise ValueError("Invalid setting :", setting_name)
+
+        setattr(args, f"{self.name}_{setting_name}", setting_value)
+
     def check_setting_value_ranges(self, args):
         for setting in settings:
             if(
@@ -178,13 +184,17 @@ class Feature(Shortenable):
         if not self.can_receive_enable_settings:
             return ''
 
-        bpm_pause_interval, bpm_active_interval = bpm_synced_intervals(
-            self.get_setting_value(args, "bpm"),
-            self.get_setting_value(args, "bpm_active_percent"),
-            video_info.fps,
-            self.get_setting_value(args, "start_at"),
-            self.get_setting_value(args, "invert_pause")
-        )
+        if(self.get_setting_value(args, "bpm") != 0):
+            bpm_pause_interval, bpm_active_interval = bpm_synced_intervals(
+                self.get_setting_value(args, "bpm"),
+                self.get_setting_value(args, "bpm_active_percent"),
+                video_info.fps,
+                self.get_setting_value(args, "start_at"),
+                self.get_setting_value(args, "invert_pause")
+            )
+
+            self.override_setting_value(args, "pause", bpm_pause_interval)
+            self.override_setting_value(args, "active", bpm_active_interval)
 
         return (
             f'''enable={join_and(
@@ -197,8 +207,8 @@ class Feature(Shortenable):
                 enable_at_interval(
                     self.get_setting_value(args, "start_at"),
                     self.get_setting_value(args, "invert_pause"),
-                    self.get_setting_value(args, "pause") if bpm_pause_interval == 0 else bpm_pause_interval,
-                    self.get_setting_value(args, "active") if bpm_active_interval == 0 else bpm_active_interval
+                    self.get_setting_value(args, "pause"),
+                    self.get_setting_value(args, "active")
                 )
             )}'''
         )
