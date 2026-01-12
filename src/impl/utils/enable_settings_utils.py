@@ -17,7 +17,10 @@ def bpm_synced_intervals(bpm, active_percent, fps, start, should_invert):
         ) # in frames
 
         active_interval = round(active_percent * beat_duration)
-        pause_interval = beat_duration - active_interval
+        pause_interval = (
+            beat_duration - active_interval if active_interval < beat_duration
+            else beat_duration # if we should last for a whole beat, pause for a whole other.
+        )
 
     return (pause_interval, active_interval)
 

@@ -185,18 +185,6 @@ class Feature(Shortenable):
         if not self.can_receive_enable_settings:
             return ''
 
-        if(self.get_setting_value(args, "bpm") != 0):
-            bpm_pause_interval, bpm_active_interval = bpm_synced_intervals(
-                self.get_setting_value(args, "bpm"),
-                self.get_setting_value(args, "bpm_active_percent"),
-                video_info.fps,
-                self.get_setting_value(args, "start_at"),
-                self.get_setting_value(args, "invert_pause")
-            )
-
-            self.override_setting_value(args, "pause", bpm_pause_interval)
-            self.override_setting_value(args, "active", bpm_active_interval)
-
         return (
             f'''enable={join_and(
                 enable_from(self.get_setting_value(args, "start_at")),
@@ -309,6 +297,21 @@ class Feature(Shortenable):
         )
 
     def video_component(self, args, video_info):
+
+        # FIXME : there is no better place to put this.
+        # If we put it in apply_enable_settings, video settings can't use this information.
+
+        if(self.get_setting_value(args, "bpm") != 0):
+            bpm_pause_interval, bpm_active_interval = bpm_synced_intervals(
+                self.get_setting_value(args, "bpm"),
+                self.get_setting_value(args, "bpm_active_percent"),
+                video_info.fps,
+                self.get_setting_value(args, "start_at"),
+                self.get_setting_value(args, "invert_pause")
+            )
+
+            self.override_setting_value(args, "pause", bpm_pause_interval)
+            self.override_setting_value(args, "active", bpm_active_interval)
 
         return (
             (
