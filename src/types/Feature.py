@@ -1,7 +1,10 @@
 from dataclasses import dataclass, field
 
 from src.types.abstract.Shortenable import Shortenable
+
 from src.types.settings.FeatureSettingDefaultValues import FeatureSettingDefaultValues
+
+from src.types.parameters.FeatureParameterApplicableComponent import FeatureParameterApplicableComponent
 from src.types.parameters.FeatureParameter import FeatureParameter
 from src.types.FeatureCombineMode import FeatureCombineMode
 
@@ -183,12 +186,37 @@ class Feature(Shortenable):
             else self.feature_filter_audio_component
         )
 
+        def applies_to_component(param):
+            return (
+                (
+                    not audio and param.applicable_component != \
+                    FeatureParameterApplicableComponent.AUDIO_COMPONENT_ONLY
+                )
+
+                or
+
+                (
+                    audio and param.applicable_component != \
+                    FeatureParameterApplicableComponent.VIDEO_COMPONENT_ONLY
+                )
+            )
+
         return component_function(
-            *[self.get_param_value(args, param_name) for param_name in self.parameter_names],
+            *[
+                self.get_param_value(args, param.name)
+                for param in self.parameters
+                if applies_to_component(param)
+            ],
 
-            *[self.get_setting_value(args, setting_name) for setting_name in self.settings_used_in_filter],
+            *[
+                self.get_setting_value(args, setting_name)
+                for setting_name in self.settings_used_in_filter
+            ],
 
-            *[getattr(video_info, required_info) for required_info in self.video_info_used_in_filter]
+            *[
+                getattr(video_info, required_info)
+                for required_info in self.video_info_used_in_filter
+            ]
         )
 
     def apply_enable_settings(self, args, video_info):

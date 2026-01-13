@@ -6,6 +6,7 @@ from src.types.Feature import Feature
 from src.types.FeatureCombineMode import FeatureCombineMode
 
 from src.types.parameters.FeatureParameter import FeatureParameter
+from src.types.parameters.FeatureParameterApplicableComponent import FeatureParameterApplicableComponent
 from src.types.parameters.FeatureParameterRange import FeatureParameterRange
 from src.types.parameters.FeatureParameterChoices import FeatureParameterChoices
 
@@ -56,9 +57,24 @@ features: list[Feature] = [
         combine_mode = FeatureCombineMode.REPLACE,
 
         parameters = (
-            FeatureParameter("factor", type = float, default = DEFAULT_SPEED_CHANGE_FACTOR),
-            FeatureParameter("preserve_pitch", type = bool, default = DEFAULT_SPEED_CHANGE_PRESERVE_PITCH),
-            FeatureParameter("preserve_formants", type = bool, default = DEFAULT_SPEED_CHANGE_PRESERVE_FORMANTS)
+            FeatureParameter(
+                "factor",
+                applicable_component = FeatureParameterApplicableComponent.BOTH_COMPONENTS,
+                type = float,
+                default = DEFAULT_SPEED_CHANGE_FACTOR
+            ),
+            FeatureParameter(
+                "preserve_pitch",
+                applicable_component = FeatureParameterApplicableComponent.AUDIO_COMPONENT_ONLY,
+                type = bool,
+                default = DEFAULT_SPEED_CHANGE_PRESERVE_PITCH
+            ),
+            FeatureParameter(
+                "preserve_formants",
+                applicable_component = FeatureParameterApplicableComponent.AUDIO_COMPONENT_ONLY,
+                type = bool,
+                default = DEFAULT_SPEED_CHANGE_PRESERVE_FORMANTS
+            )
         )
     ),
 

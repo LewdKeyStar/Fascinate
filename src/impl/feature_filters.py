@@ -155,9 +155,7 @@ def afterimages_filter(
     )
 
 def speed_change_filter(
-    speed_change_factor,
-    speed_change_preserve_pitch,
-    speed_change_preserve_formants
+    speed_change_factor
 ):
 
     return (

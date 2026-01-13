@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 
 from src.types.abstract.Shortenable import Shortenable
+
+from src.types.parameters.FeatureParameterApplicableComponent import FeatureParameterApplicableComponent
 from src.types.parameters.FeatureParameterRange import FeatureParameterRange
 from src.types.parameters.FeatureParameterChoices import FeatureParameterChoices
 
@@ -13,6 +15,8 @@ class FeatureParameter(Shortenable):
     default: any = 0
     unit: str = ""
     type: any = int
+
+    applicable_component: FeatureParameterApplicableComponent = FeatureParameterApplicableComponent.VIDEO_COMPONENT_ONLY
 
     # Normally, choices and a range should not coexist...but who knows.
 
