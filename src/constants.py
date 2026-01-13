@@ -1,5 +1,12 @@
 VALID_AXES = ["x", "y"]
 VALID_COLORS = ["rg", "rb", "br", "bg", "gr", "gb"]
+VALID_FADE_FUNCTIONS = [
+    "linear", "l",
+    "ease_out", "eo",
+    "ease_in_out", "eio"
+]
+
+DEFAULT_FADE_FUNCTION = "ease_in_out"
 
 DEFAULT_OUTPUT = "default" # This is just a placeholder, not an actual filename.
 

@@ -1,10 +1,11 @@
-from src.constants import UINT32_MAX
+from src.constants import UINT32_MAX, VALID_FADE_FUNCTIONS, DEFAULT_FADE_FUNCTION
 
 from src.types.settings.FeatureEnableSetting import FeatureEnableSetting
 from src.types.settings.FilterBearingFeatureVideoSetting import FilterBearingFeatureVideoSetting
 from src.types.settings.FilterLessFeatureVideoSetting import FilterLessFeatureVideoSetting
 
 from src.types.settings.FeatureSettingRange import FeatureSettingRange
+from src.types.settings.FeatureSettingChoices import FeatureSettingChoices
 
 # A declarative list of filter enable settings,
 # And the respective conditions for which they are considered "active".
@@ -96,6 +97,8 @@ filter_bearing_video_settings: list[FilterBearingFeatureVideoSetting] = [
 
         requires_overlay = True,
 
+        video_settings_used_in_setting_filter = ["fade_in_function"],
+
         enable_settings_used_in_setting_filter = [
             "start_at",
             "pause",
@@ -111,6 +114,8 @@ filter_bearing_video_settings: list[FilterBearingFeatureVideoSetting] = [
 
         requires_overlay = True,
 
+        video_settings_used_in_setting_filter = ["fade_out_function"],
+
         enable_settings_used_in_setting_filter = ["end_at"],
 
         video_info_used_in_setting_filter = ["duration"]
@@ -125,6 +130,8 @@ filter_bearing_video_settings: list[FilterBearingFeatureVideoSetting] = [
         video_settings_used_in_setting_filter = [
             "fade_in",
             "fade_out",
+            "fade_in_function",
+            "fade_out_function",
             "fade_cyclical_peak",
             "fade_cyclical_trough",
             "fade_cyclical_sync",
@@ -148,6 +155,20 @@ filter_bearing_video_settings: list[FilterBearingFeatureVideoSetting] = [
 ]
 
 filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
+    FilterLessFeatureVideoSetting(
+        name = "fade_in_function",
+        type = str,
+        choices = FeatureSettingChoices(VALID_FADE_FUNCTIONS),
+        default = DEFAULT_FADE_FUNCTION
+    ),
+
+    FilterLessFeatureVideoSetting(
+        name = "fade_out_function",
+        type = str,
+        choices = FeatureSettingChoices(VALID_FADE_FUNCTIONS),
+        default = DEFAULT_FADE_FUNCTION
+    ),
+
     # The number of frames in a non-synced cyclical fade between the in and out phase,
     # where the filter stays at full opacity.
 

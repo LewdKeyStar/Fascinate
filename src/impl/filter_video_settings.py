@@ -9,6 +9,8 @@ def alpha_filter(alpha):
 def fade_in_filter(
     fade_in_duration,
 
+    fade_in_function,
+
     feature_start_at,
     feature_pause,
     feature_invert_pause,
@@ -17,6 +19,8 @@ def fade_in_filter(
 ):
     return fade_in_filter_generic(
         fade_in_duration = fade_in_duration,
+
+        fade_in_function = fade_in_function,
 
         feature_start_at = feature_start_at,
         feature_pause = feature_pause,
@@ -28,12 +32,16 @@ def fade_in_filter(
 def fade_out_filter(
     fade_out_duration,
 
+    fade_out_function,
+
     feature_end_at,
 
     video_duration
 ):
     return fade_out_filter_generic(
         fade_out_duration = fade_out_duration,
+
+        fade_out_function = fade_out_function,
 
         feature_end_at = feature_end_at,
 
@@ -45,6 +53,9 @@ def fade_cyclical_filter(
 
     fade_in_duration,
     fade_out_duration,
+
+    fade_in_function,
+    fade_out_function,
 
     fade_cyclical_peak,
     fade_cyclical_trough,
@@ -70,6 +81,7 @@ def fade_cyclical_filter(
         fade_in_filter_generic(
             fade_in_duration = fade_in_duration,
             fade_out_duration = fade_out_duration,
+            fade_in_function = fade_in_function,
             fade_cyclical = fade_cyclical,
             fade_cyclical_peak = fade_cyclical_peak,
             fade_cyclical_trough = fade_cyclical_trough,
@@ -86,6 +98,7 @@ def fade_cyclical_filter(
         fade_out_filter_generic(
             fade_out_duration = fade_out_duration,
             fade_in_duration = fade_in_duration,
+            fade_out_function = fade_out_function,
             fade_cyclical = fade_cyclical,
             fade_cyclical_peak = fade_cyclical_peak,
             fade_cyclical_trough = fade_cyclical_trough,

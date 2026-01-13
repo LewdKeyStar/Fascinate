@@ -1,3 +1,5 @@
+from src.constants import DEFAULT_FADE_FUNCTION
+
 from src.impl.utils.video_settings_utils import fade_cyclical_sync_values
 from src.impl.utils.enable_settings_utils import effective_feature_start
 
@@ -30,7 +32,18 @@ def split_filter(primary_name, secondary_name):
 def overlay_filter(primary_name, secondary_name):
     return f"[{primary_name}][{secondary_name}]overlay"
 
-def fade_filter(type, start_frame, end_frame, video_duration, n_expression, cyclical_offset):
+def fade_filter(
+    type,
+
+    start_frame,
+    end_frame,
+
+    video_duration,
+
+    n_expression,
+    fade_function,
+    cyclical_offset
+):
 
     # In the case of a cyclical fade, the modulo calculations can only work
     # if the start offset is subtracted from the fade bounds.
@@ -50,14 +63,19 @@ def fade_filter(type, start_frame, end_frame, video_duration, n_expression, cycl
     def elapsed_time_relative():
         return f"({elapsed_time()} / {duration()})"
 
-    # linear = f"({elapsed_time_relative()})"
-    ease_in_out_quad = (
+    linear = l = f"({elapsed_time_relative()})"
+    ease_out = eo = (
+        f"(1 - (1 - {elapsed_time_relative()})^2)"
+    )
+    ease_in_out = eio = (
         f"if("
             f"lt({elapsed_time_relative()}, 1/2),"
             f"2 * {elapsed_time_relative()}^2,"
             f"1 - (((-2 * {elapsed_time_relative()} + 2)^2) / 2)"
         f")"
     )
+
+    chosen_fade_function = locals()[fade_function]
 
     # The fade expression must be clamped,
     # because the frame values extend outside the function definition range.
@@ -70,7 +88,7 @@ def fade_filter(type, start_frame, end_frame, video_duration, n_expression, cycl
             f"if("
                 f"gt({n_expression}, {duration() if type == 'in' and n_expression != 'N' else end_frame}),"
                 f"{'p(X,Y)' if type == 'in' else '0'},"
-                f"p(X,Y)*min(max(0.0, {ease_in_out_quad if type == 'in' else f'1 - {ease_in_out_quad}'}), 1.0)"
+                f"p(X,Y)*min(max(0.0, {chosen_fade_function if type == 'in' else f'1 - {chosen_fade_function}'}), 1.0)"
             f")"
         f")'"
     )
@@ -87,6 +105,8 @@ def fade_in_filter_generic(
 
     fade_in_duration = 0,
     fade_out_duration = 0,
+
+    fade_in_function = DEFAULT_FADE_FUNCTION,
 
     fade_cyclical = False,
 
@@ -146,6 +166,7 @@ def fade_in_filter_generic(
                 "N" if not fade_cyclical
                 else f"mod(N - {actual_feature_start}, {total_fade_time + fade_cyclical_trough})"
             ),
+            fade_function = fade_in_function,
             cyclical_offset = actual_feature_start if fade_cyclical else 0
         )}'''
     )
@@ -155,6 +176,8 @@ def fade_out_filter_generic(
 
     fade_out_duration = 0,
     fade_in_duration = 0,
+
+    fade_out_function = DEFAULT_FADE_FUNCTION,
 
     fade_cyclical = False,
 
@@ -221,6 +244,7 @@ def fade_out_filter_generic(
                 "N" if not fade_cyclical
                 else f"mod(N - {actual_feature_start}, {total_fade_time + fade_cyclical_trough})"
             ),
+            fade_function = fade_out_function,
             cyclical_offset = actual_feature_start if fade_cyclical else 0
         )}'''
     )
