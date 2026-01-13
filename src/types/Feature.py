@@ -8,6 +8,7 @@ from src.types.FeatureCombineMode import FeatureCombineMode
 from src.decl.filter_settings_list import (
     settings,
     enable_settings,
+    video_settings,
     filter_bearing_video_settings,
     filterless_video_settings,
     valid_setting_names,
@@ -128,7 +129,8 @@ class Feature(Shortenable):
         setattr(args, f"{self.name}_{setting_name}", setting_value)
 
     def check_setting_value_ranges(self, args):
-        for setting in settings:
+
+        def check_setting_value_range(args, setting):
             if(
                 setting.range is not None
                 and self.get_setting_value(args, setting.name) not in setting.range
@@ -138,6 +140,14 @@ class Feature(Shortenable):
                     f"{self.name}_{setting.name} with value {self.get_setting_value(args, setting.name)}"
                     f" is not in range {setting.range}"
                 ))
+
+        if self.can_receive_enable_settings:
+            for setting in enable_settings:
+                check_setting_value_range(args, setting)
+
+        if self.can_receive_video_settings:
+            for setting in video_settings:
+                check_setting_value_range(args, setting)
 
     def video_setting_filter(self, setting_name):
         if setting_name not in valid_video_setting_filter_names:
@@ -301,7 +311,7 @@ class Feature(Shortenable):
         # FIXME : there is no better place to put this.
         # If we put it in apply_enable_settings, video settings can't use this information.
 
-        if(self.get_setting_value(args, "bpm") != 0):
+        if self.can_receive_video_settings and self.get_setting_value(args, "bpm") != 0:
             bpm_pause_interval, bpm_active_interval = bpm_synced_intervals(
                 self.get_setting_value(args, "bpm"),
                 self.get_setting_value(args, "bpm_active_percent"),
