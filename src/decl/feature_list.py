@@ -79,6 +79,52 @@ features: list[Feature] = [
     ),
 
     Feature(
+        name = "fade_in",
+
+        can_receive_enable_settings = False,
+        can_receive_video_settings = False,
+
+        combine_mode = FeatureCombineMode.REPLACE,
+
+        parameters = (
+            FeatureParameter(
+                "duration",
+                default = DEFAULT_FADE_DURATION
+            ),
+            FeatureParameter(
+                "color",
+                type = str,
+                default = DEFAULT_FADE_COLOR
+            )
+        ),
+
+        video_info_used_in_filter = ["duration"]
+    ),
+
+    Feature(
+        name = "fade_out",
+
+        can_receive_enable_settings = False,
+        can_receive_video_settings = False,
+
+        combine_mode = FeatureCombineMode.REPLACE,
+
+        parameters = (
+            FeatureParameter(
+                "duration",
+                default = DEFAULT_FADE_DURATION
+            ),
+            FeatureParameter(
+                "color",
+                type = str,
+                default = DEFAULT_FADE_COLOR
+            )
+        ),
+
+        video_info_used_in_filter = ["duration"]
+    ),
+
+    Feature(
         name = "afterimages",
 
         special_shorthand = "afi",

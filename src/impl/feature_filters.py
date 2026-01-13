@@ -235,3 +235,28 @@ def hue_saturation_filter(
         f"s={hue_saturation_saturation}:"
         f"b={hue_saturation_brightness}"
     )
+
+def fade_in_filter(
+    fade_in_duration,
+    fade_in_color,
+
+    video_duration
+):
+    return (
+        f"fade=t=in:"
+        f"n={min(fade_in_duration, video_duration)}:"
+        f"c={fade_in_color}"
+    )
+
+def fade_out_filter(
+    fade_out_duration,
+    fade_out_color,
+
+    video_duration
+):
+    return (
+        f"fade=t=out:"
+        f"s={max(0, video_duration-fade_out_duration)}:"
+        f"n={min(fade_out_duration, video_duration)}:"
+        f"c={fade_out_color}"
+    )
