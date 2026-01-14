@@ -289,21 +289,48 @@ features: list[Feature] = [
             FeatureParameter(
                 "center_x",
                 special_shorthand = "x",
+
                 type = float,
-                unit = "px",
-                default = DEFAULT_ZOOM_CENTER_X
+
+                default = DEFAULT_ZOOM_CENTER_X,
+
+                unit = lambda args: (
+                    "" if getattr(args, "zoom_center_x") == DEFAULT_ZOOM_CENTER_X
+                    else "%" if getattr(args, "zoom_relative_mode")
+                    else "px"
+                ),
+
+                renamed_values = {DEFAULT_ZOOM_CENTER_X: "center"},
+                value_format = lambda args, value: (
+                    int(value) if not getattr(args, "zoom_relative_mode")
+                    else int(100*value)
+                )
             ),
             FeatureParameter(
                 "center_y",
                 special_shorthand = "y",
+
                 type = float,
-                unit = "px",
-                default = DEFAULT_ZOOM_CENTER_Y
+
+                default = DEFAULT_ZOOM_CENTER_Y,
+
+                unit = lambda args: (
+                    "" if getattr(args, "zoom_center_y") == DEFAULT_ZOOM_CENTER_Y
+                    else "%" if getattr(args, "zoom_relative_mode")
+                    else "px"
+                ),
+
+                renamed_values = {DEFAULT_ZOOM_CENTER_Y: "center"},
+                value_format = lambda args, value: (
+                    int(value) if not getattr(args, "zoom_relative_mode")
+                    else int(100*value)
+                )
             ),
             FeatureParameter(
                 "relative_mode",
                 type = bool,
-                default = DEFAULT_ZOOM_RELATIVE_MODE
+                default = DEFAULT_ZOOM_RELATIVE_MODE,
+                include_in_filename = False
             )
         ],
 

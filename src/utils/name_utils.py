@@ -24,8 +24,12 @@ def feature_section(
         )
 
     def param_print(param):
-        param_value = getattr(args, f"{feature.name}_{param.name}")
-        return "_".join([f"{param.shorthand}", f"{param_value}"+f"{param.unit}"])
+        if not param.include_in_filename: # Unlike settings, this is just a yes or no flag.
+            return ""
+
+        param_value = param.get_named_value_for_feature(args, feature.name)
+        param_unit = param.unit if not callable(param.unit) else param.unit(args)
+        return "_".join([f"{param.shorthand}", f"{param_value}"+f"{param_unit}"])
 
     def print_feature_params():
         return "_".join([param_print(param) for param in feature.parameters])
