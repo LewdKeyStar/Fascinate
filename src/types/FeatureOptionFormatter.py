@@ -33,7 +33,16 @@ class FeatureOptionFormatter:
 
     @property
     def named_option_value(self):
-        return self.option.get_named_value_for_feature(self.args, self.feature.name)
+        actual_value = self.option_value
+
+        if actual_value in self.option.renamed_values:
+            return self.option.renamed_values[actual_value]
+
+        return (
+            self.option.value_format(self.args, actual_value)
+            if len(signature(self.option.value_format).parameters) == 2
+            else self.option.value_format(self.args, self.feature.name, actual_value)
+        )
 
     @property
     def option_unit(self):
