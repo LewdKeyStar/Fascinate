@@ -157,6 +157,32 @@ filter_bearing_video_settings: list[FilterBearingFeatureVideoSetting] = [
 
         default = False,
         include_in_filename = lambda x: x
+    ),
+
+    FilterBearingFeatureVideoSetting(
+        name = "crop",
+        special_shorthand = "cr",
+        type = bool,
+
+        requires_overlay = True,
+
+        own_value_used_in_setting_filter = False,
+
+        video_settings_used_in_setting_filter = [
+            "crop_top", "crop_bottom", "crop_left", "crop_right",
+
+            "crop_center_x", "crop_center_y",
+            "crop_width", "crop_height",
+
+            "crop_edge_fade",
+
+            "crop_center_mode", "crop_relative_mode"
+        ],
+
+        video_info_used_in_setting_filter = ["resolution"],
+
+        default = False,
+        include_in_filename = lambda x: x
     )
 ]
 
@@ -242,7 +268,215 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
         ),
 
         value_format = lambda args, value: int(100*value)
-    )
+    ),
+
+    # Behold : the shining example of how bad the variable signature system is.
+    # Holy duplication, Batman!
+
+    FilterLessFeatureVideoSetting(
+        name = "crop_top",
+        special_shorthand = "crt",
+        type = float,
+
+        unit = lambda args, feature_name, value: (
+            "%" if getattr(args, f"{feature_name}_crop_relative_mode")
+            else "px"
+        ),
+
+        value_format = lambda args, feature_name, value: (
+            int(value) if not getattr(args, f"{feature_name}_crop_relative_mode")
+            else int(100*value)
+        ),
+
+        include_in_filename = lambda args, feature_name, value: (
+            getattr(args, f"{feature_name}_crop")
+            and
+            not getattr(args, f"{feature_name}_crop_center_mode")
+        )
+    ),
+
+    FilterLessFeatureVideoSetting(
+        name = "crop_bottom",
+        special_shorthand = "crb",
+        type = float,
+
+        unit = lambda args, feature_name, value: (
+            "%" if getattr(args, f"{feature_name}_crop_relative_mode")
+            else "px"
+        ),
+
+        value_format = lambda args, feature_name, value: (
+            int(value) if not getattr(args, f"{feature_name}_crop_relative_mode")
+            else int(100*value)
+        ),
+
+        include_in_filename = lambda args, feature_name, value: (
+            getattr(args, f"{feature_name}_crop")
+            and
+            not getattr(args, f"{feature_name}_crop_center_mode")
+        )
+    ),
+
+    FilterLessFeatureVideoSetting(
+        name = "crop_left",
+        special_shorthand = "crl",
+        type = float,
+
+        unit = lambda args, feature_name, value: (
+            "%" if getattr(args, f"{feature_name}_crop_relative_mode")
+            else "px"
+        ),
+
+        value_format = lambda args, feature_name, value: (
+            int(value) if not getattr(args, f"{feature_name}_crop_relative_mode")
+            else int(100*value)
+        ),
+
+        include_in_filename = lambda args, feature_name, value: (
+            getattr(args, f"{feature_name}_crop")
+            and
+            not getattr(args, f"{feature_name}_crop_center_mode")
+        )
+    ),
+
+    FilterLessFeatureVideoSetting(
+        name = "crop_right",
+        special_shorthand = "crr",
+        type = float,
+
+        unit = lambda args, feature_name, value: (
+            "%" if getattr(args, f"{feature_name}_crop_relative_mode")
+            else "px"
+        ),
+
+        value_format = lambda args, feature_name, value: (
+            int(value) if not getattr(args, f"{feature_name}_crop_relative_mode")
+            else int(100*value)
+        ),
+
+        include_in_filename = lambda args, feature_name, value: (
+            getattr(args, f"{feature_name}_crop")
+            and
+            not getattr(args, f"{feature_name}_crop_center_mode")
+        )
+    ),
+
+    FilterLessFeatureVideoSetting(
+        name = "crop_center_x",
+        special_shorthand = "crx",
+        type = float,
+
+        unit = lambda args, feature_name, value: (
+            "%" if getattr(args, f"{feature_name}_crop_relative_mode")
+            else "px"
+        ),
+
+        value_format = lambda args, feature_name, value: (
+            int(value) if not getattr(args, f"{feature_name}_crop_relative_mode")
+            else int(100*value)
+        ),
+
+        include_in_filename = lambda args, feature_name, value: (
+            getattr(args, f"{feature_name}_crop")
+            and
+            getattr(args, f"{feature_name}_crop_center_mode")
+        )
+    ),
+
+    FilterLessFeatureVideoSetting(
+        name = "crop_center_y",
+        special_shorthand = "cry",
+        type = float,
+
+        unit = lambda args, feature_name, value: (
+            "%" if getattr(args, f"{feature_name}_crop_relative_mode")
+            else "px"
+        ),
+
+        value_format = lambda args, feature_name, value: (
+            int(value) if not getattr(args, f"{feature_name}_crop_relative_mode")
+            else int(100*value)
+        ),
+
+        include_in_filename = lambda args, feature_name, value: (
+            getattr(args, f"{feature_name}_crop")
+            and
+            getattr(args, f"{feature_name}_crop_center_mode")
+        )
+    ),
+
+    FilterLessFeatureVideoSetting(
+        name = "crop_width",
+        special_shorthand = "crw",
+        type = float,
+
+        unit = lambda args, feature_name, value: (
+            "%" if getattr(args, f"{feature_name}_crop_relative_mode")
+            else "px"
+        ),
+
+        value_format = lambda args, feature_name, value: (
+            int(value) if not getattr(args, f"{feature_name}_crop_relative_mode")
+            else int(100*value)
+        ),
+
+        include_in_filename = lambda args, feature_name, value: (
+            getattr(args, f"{feature_name}_crop")
+            and
+            getattr(args, f"{feature_name}_crop_center_mode")
+        )
+    ),
+
+    FilterLessFeatureVideoSetting(
+        name = "crop_height",
+        special_shorthand = "crh",
+        type = float,
+
+        unit = lambda args, feature_name, value: (
+            "%" if getattr(args, f"{feature_name}_crop_relative_mode")
+            else "px"
+        ),
+
+        value_format = lambda args, feature_name, value: (
+            int(value) if not getattr(args, f"{feature_name}_crop_relative_mode")
+            else int(100*value)
+        ),
+
+        include_in_filename = lambda args, feature_name, value: (
+            getattr(args, f"{feature_name}_crop")
+            and
+            getattr(args, f"{feature_name}_crop_center_mode")
+        )
+    ),
+
+    FilterLessFeatureVideoSetting(
+        name = "crop_edge_fade",
+        special_shorthand = "cref",
+
+        include_in_filename = lambda args, feature_name, value: (
+            getattr(args, f"{feature_name}_crop")
+            and
+            value > 0
+        )
+    ),
+
+    FilterLessFeatureVideoSetting(
+        name = "crop_center_mode",
+        special_shorthand = "crcm",
+        type = bool,
+        default = False,
+
+        include_in_filename = False
+    ),
+
+    FilterLessFeatureVideoSetting(
+        name = "crop_relative_mode",
+        special_shorthand = "crrm",
+        type = bool,
+        default = False,
+
+        include_in_filename = False
+    ),
 ]
 
 video_settings = filter_bearing_video_settings + filterless_video_settings
