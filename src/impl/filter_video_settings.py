@@ -131,6 +131,40 @@ def crop_filter(
     resolution
 ):
 
+    if (
+        crop_center_mode
+        and
+        any(
+            param < 0 for param in [
+                crop_center_x,
+                crop_center_y,
+                crop_width,
+                crop_height
+            ]
+        )
+    ):
+        raise ValueError(
+            "Center-mode feature crop invoked without setting all of : "
+            "crop center x, crop center y, crop width, crop height"
+        )
+
+    if(
+        not crop_center_mode
+        and
+        any(
+            param < 0 for param in [
+                crop_top,
+                crop_bottom,
+                crop_left,
+                crop_right
+            ]
+        )
+    ):
+        raise ValueError(
+            "Corner-mode feature crop invoked without setting all of : "
+            "crop top, crop bottom, crop left, crop right"
+        )
+
     width, height = resolution.split("x")
     width, height = int(width), int(height)
 

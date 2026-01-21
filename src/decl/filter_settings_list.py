@@ -278,6 +278,8 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
         special_shorthand = "crt",
         type = float,
 
+        default = -1,
+
         unit = lambda args, feature_name, value: (
             "%" if getattr(args, f"{feature_name}_crop_relative_mode")
             else "px"
@@ -299,6 +301,8 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
         name = "crop_bottom",
         special_shorthand = "crb",
         type = float,
+
+        default = -1,
 
         unit = lambda args, feature_name, value: (
             "%" if getattr(args, f"{feature_name}_crop_relative_mode")
@@ -322,6 +326,8 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
         special_shorthand = "crl",
         type = float,
 
+        default = -1,
+
         unit = lambda args, feature_name, value: (
             "%" if getattr(args, f"{feature_name}_crop_relative_mode")
             else "px"
@@ -343,6 +349,8 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
         name = "crop_right",
         special_shorthand = "crr",
         type = float,
+
+        default = -1,
 
         unit = lambda args, feature_name, value: (
             "%" if getattr(args, f"{feature_name}_crop_relative_mode")
@@ -366,6 +374,8 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
         special_shorthand = "crx",
         type = float,
 
+        default = -1,
+
         unit = lambda args, feature_name, value: (
             "%" if getattr(args, f"{feature_name}_crop_relative_mode")
             else "px"
@@ -387,6 +397,8 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
         name = "crop_center_y",
         special_shorthand = "cry",
         type = float,
+
+        default = -1,
 
         unit = lambda args, feature_name, value: (
             "%" if getattr(args, f"{feature_name}_crop_relative_mode")
@@ -410,6 +422,8 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
         special_shorthand = "crw",
         type = float,
 
+        default = -1,
+
         unit = lambda args, feature_name, value: (
             "%" if getattr(args, f"{feature_name}_crop_relative_mode")
             else "px"
@@ -431,6 +445,8 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
         name = "crop_height",
         special_shorthand = "crh",
         type = float,
+
+        default = -1,
 
         unit = lambda args, feature_name, value: (
             "%" if getattr(args, f"{feature_name}_crop_relative_mode")
