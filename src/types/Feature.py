@@ -8,6 +8,8 @@ from src.types.parameters.FeatureParameterApplicableComponent import FeaturePara
 from src.types.parameters.FeatureParameter import FeatureParameter
 from src.types.FeatureCombineMode import FeatureCombineMode
 
+from src.parser_namespace import runtime_value, is_enabled_at_runtime, override_runtime_value
+
 from src.decl.filter_settings_list import (
     settings,
     enable_settings,
@@ -78,8 +80,9 @@ class Feature(Shortenable):
         ):
             raise ValueError("Pre-merged feature declared without access to alpha")
 
-    def is_enabled(self, args):
-        return getattr(args, self.name)
+    @property
+    def is_enabled(self):
+        return is_enabled_at_runtime(self.name)
 
     @property
     def feature_filter(self):
@@ -89,27 +92,42 @@ class Feature(Shortenable):
     def feature_filter_audio_component(self):
         return getattr(src.impl.feature_filters, f"{self.name}_filter_audio_component")
 
+    def get_valid_option_names(self, option_type):
+        return (
+            self.parameter_names
+            if option_type == "parameter"
+            else valid_setting_names
+        )
+
+    def get_option_value(self, option_name, option_type):
+        if option_name not in self.get_valid_option_names(option_type):
+            raise ValueError(f"Invalid {option_type} :", param_name)
+
+        return runtime_value(self.name, option_name)
+
+    def check_option_value_range(self, option, option_type):
+        option_value = self.get_option_value(option.name, option_type)
+
+        if (
+            option.range is not None
+            and option_value not in option.range
+        ):
+            raise ValueError((
+                f"{option_type.capitalize()} value out of range : "
+                f"{self.name}_{option.name} with value {option_value}"
+                f" is not in range {option.range}"
+            ))
+
     @property
     def parameter_names(self):
         return [param.name for param in self.parameters]
 
-    def get_param_value(self, args, param_name):
-        if param_name not in self.parameter_names:
-            raise ValueError("Invalid parameter :", param_name)
+    def get_param_value(self, param_name):
+        return self.get_option_value(param_name, "parameter")
 
-        return getattr(args, f"{self.name}_{param_name}")
-
-    def check_param_value_ranges(self, args):
+    def check_param_value_ranges(self):
         for param in self.parameters:
-            if (
-                param.range is not None
-                and self.get_param_value(args, param.name) not in param.range
-            ):
-                raise ValueError((
-                    f"Parameter value out of range : "
-                    f"{self.name}_{param.name} with value {self.get_param_value(args, param.name)}"
-                    f" is not in range {param.range}"
-                ))
+            self.check_option_value_range(param, "parameter")
 
     def default_setting_value(self, setting_name):
         return (
@@ -119,38 +137,24 @@ class Feature(Shortenable):
             # But the alternative is to run a find() on the settings list...
         )
 
-    def get_setting_value(self, args, setting_name):
+    def get_setting_value(self, setting_name):
+        return self.get_option_value(setting_name, "setting")
+
+    def override_setting_value(self, setting_name, setting_value):
         if setting_name not in valid_setting_names:
             raise ValueError("Invalid setting :", setting_name)
 
-        return getattr(args, f"{self.name}_{setting_name}")
+        override_runtime_value(self.name, setting_name, setting_value)
 
-    def override_setting_value(self, args, setting_name, setting_value):
-        if setting_name not in valid_setting_names:
-            raise ValueError("Invalid setting :", setting_name)
-
-        setattr(args, f"{self.name}_{setting_name}", setting_value)
-
-    def check_setting_value_ranges(self, args):
-
-        def check_setting_value_range(args, setting):
-            if(
-                setting.range is not None
-                and self.get_setting_value(args, setting.name) not in setting.range
-            ):
-                raise ValueError((
-                    f"Setting value out of range : "
-                    f"{self.name}_{setting.name} with value {self.get_setting_value(args, setting.name)}"
-                    f" is not in range {setting.range}"
-                ))
+    def check_setting_value_ranges(self):
 
         if self.can_receive_enable_settings:
             for setting in enable_settings:
-                check_setting_value_range(args, setting)
+                self.check_option_value_range(setting, "setting")
 
         if self.can_receive_video_settings:
             for setting in video_settings:
-                check_setting_value_range(args, setting)
+                self.check_option_value_range(setting, "setting")
 
     def video_setting_filter(self, setting_name):
         if setting_name not in valid_video_setting_filter_names:
@@ -178,7 +182,7 @@ class Feature(Shortenable):
     def filter_io_label_after_video_effects(self):
         return f"{self.name}_after_video_effects"
 
-    def feature_filterstr(self, args, video_info, audio = False):
+    def feature_filterstr(self, video_info, audio = False):
 
         component_function = (
             self.feature_filter
@@ -203,13 +207,13 @@ class Feature(Shortenable):
 
         return component_function(
             *[
-                self.get_param_value(args, param.name)
+                self.get_param_value(param.name)
                 for param in self.parameters
                 if applies_to_component(param)
             ],
 
             *[
-                self.get_setting_value(args, setting_name)
+                self.get_setting_value(setting.name)
                 for setting_name in self.settings_used_in_filter
             ],
 
@@ -219,54 +223,48 @@ class Feature(Shortenable):
             ]
         )
 
-    def apply_enable_settings(self, args, video_info):
+    def apply_enable_settings(self, video_info):
         if not self.can_receive_enable_settings:
             return ''
 
         return (
             f'''enable={join_and(
-                enable_from(self.get_setting_value(args, "start_at")),
-                enable_until(self.get_setting_value(args, "end_at")),
+                enable_from(self.get_setting_value("start_at")),
+                enable_until(self.get_setting_value("end_at")),
                 enable_every(
-                    self.get_setting_value(args, "start_at"),
-                    self.get_setting_value(args, "every")
+                    self.get_setting_value("start_at"),
+                    self.get_setting_value("every")
                 ),
                 enable_at_interval(
-                    self.get_setting_value(args, "start_at"),
-                    self.get_setting_value(args, "invert_pause"),
-                    self.get_setting_value(args, "pause"),
-                    self.get_setting_value(args, "active")
+                    self.get_setting_value("start_at"),
+                    self.get_setting_value("invert_pause"),
+                    self.get_setting_value("pause"),
+                    self.get_setting_value("active")
                 )
             )}'''
         )
 
-    def should_apply_alpha(self, args):
+    @property
+    def should_apply_alpha(self):
 
         return (
             (self.combine_mode not in (FeatureCombineMode.REPLACE, FeatureCombineMode.PRE_MERGED))
             and
-            (self.combine_mode != FeatureCombineMode.MERGE or self.get_setting_value(args, "alpha") != 1.0)
+            (self.combine_mode != FeatureCombineMode.MERGE or self.get_setting_value("alpha") != 1.0)
         )
 
-    def apply_video_settings(self, filterstr, args, video_info):
+    def apply_video_settings(self, filterstr, video_info):
 
         if not self.can_receive_video_settings:
             return filterstr
 
-        # Alpha should not always be applied, even if it appears in settings.
-
-        alpha_setting = array_find(filter_bearing_video_settings, lambda setting: setting.name == "alpha")
-        alpha_setting.enabled = self.should_apply_alpha
-
-        # Surprisingly, this argument bait and switch works.
-        # Thank the Devil for dynamic typing :)
-
         enabled_video_settings = [
             setting for setting in filter_bearing_video_settings
-            if setting.enabled(
-                self.get_setting_value(args, setting.name)
+
+            if (
+                setting.enabled(self.name, self.get_setting_value(setting.name))
                 if setting.name != "alpha"
-                else args
+                else self.should_apply_alpha
             )
         ]
 
@@ -290,21 +288,21 @@ class Feature(Shortenable):
                 filterstr,
                 self.video_setting_filter(video_setting.name)(
                     *(
-                        [self.get_setting_value(args, video_setting.name)]
+                        [self.get_setting_value(video_setting.name)]
                         if video_setting.own_value_used_in_setting_filter
                         else []
                     ),
 
                     *[
                         self.get_setting_value(
-                            args, required_filterless_video_setting_name
+                            required_filterless_video_setting_name
                         )
                         for required_filterless_video_setting_name in video_setting.video_settings_used_in_setting_filter
                     ],
 
                     *[
                         self.get_setting_value(
-                            args, required_enable_setting_name
+                            required_enable_setting_name
                         )
                         for required_enable_setting_name in video_setting.enable_settings_used_in_setting_filter
                     ],
@@ -338,56 +336,54 @@ class Feature(Shortenable):
             )
         )
 
-    def video_component(self, args, video_info):
+    def video_component(self, video_info):
 
         # FIXME : there is no better place to put this.
         # If we put it in apply_enable_settings, video settings can't use this information.
 
-        if self.can_receive_video_settings and self.get_setting_value(args, "bpm") != 0:
+        if self.can_receive_video_settings and self.get_setting_value("bpm") != 0:
             bpm_pause_interval, bpm_active_interval = bpm_synced_intervals(
-                self.get_setting_value(args, "bpm"),
-                self.get_setting_value(args, "bpm_active_percent"),
+                self.get_setting_value("bpm"),
+                self.get_setting_value("bpm_active_percent"),
                 video_info.fps,
-                self.get_setting_value(args, "start_at"),
-                self.get_setting_value(args, "invert_pause")
+                self.get_setting_value("start_at"),
+                self.get_setting_value("invert_pause")
             )
 
-            self.override_setting_value(args, "pause", bpm_pause_interval)
-            self.override_setting_value(args, "active", bpm_active_interval)
+            self.override_setting_value("pause", bpm_pause_interval)
+            self.override_setting_value("active", bpm_active_interval)
 
         return (
             (
                 self.apply_video_settings(
-                    self.feature_filterstr(args, video_info),
-                    args,
+                    self.feature_filterstr(video_info),
                     video_info
                 )
             )
             +
             (
                 self.apply_enable_settings(
-                    args,
                     video_info
                 )
             )
         )
 
-    def audio_component(self, args, video_info):
+    def audio_component(self, video_info):
         if not self.has_audio_component:
             return ''
 
-        return self.feature_filterstr(args, video_info, audio = True)
+        return self.feature_filterstr(video_info, audio = True)
 
-    def __call__(self, args, video_info, seeking_audio_component = False):
+    def __call__(self, video_info, seeking_audio_component = False):
 
-        if not self.is_enabled(args):
+        if not self.is_enabled:
             return ''
 
-        self.check_param_value_ranges(args)
-        self.check_setting_value_ranges(args)
+        self.check_param_value_ranges()
+        self.check_setting_value_ranges()
 
         return (
-            self.video_component(args, video_info)
+            self.video_component(video_info)
             if not seeking_audio_component
-            else self.audio_component(args, video_info)
+            else self.audio_component(video_info)
         )

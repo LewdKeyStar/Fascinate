@@ -2,8 +2,6 @@ from dataclasses import dataclass, field
 
 from typing import Union, Callable
 
-from argparse import Namespace
-
 from src.types.abstract.Shortenable import Shortenable
 from src.types.abstract.Choices import Choices
 from src.types.abstract.Range import Range
@@ -17,16 +15,14 @@ class FeatureOption(Shortenable):
     default: any = 0
     unit: Union[
         str,
-        Callable[[Namespace], str],
-        Callable[[Namespace, str], str]
+        Callable # exact callable signatures are not provided, but defined in inheritance
     ] = ""
 
-    type: any = int
+    type: any = int # Cannot be made variable, the ArgumentParser wouldn't understand it
 
     include_in_filename: Union[
-        bool, # used for all parameters for now
-        Callable[[any], bool], # option_value => bool
-        Callable[[Namespace, str, any], bool] # args, feature_name, option_value => bool
+        bool,
+        Callable
     ] = True
 
     # Normally, choices and a range should not coexist...but who knows.
@@ -36,11 +32,10 @@ class FeatureOption(Shortenable):
 
     desc: str = ""
 
+    # Since type cannot vary, the formatters use conditional value reformatting instead.
+
     renamed_values: dict[any, str] = field(default_factory = dict)
-    value_format: Union[
-        Callable[[Namespace, any], str],
-        Callable[[Namespace, str, any], str]
-    ] = lambda x, y: y
+    value_format: Callable = None # Default has to be provided, but will be overriden in inheritance
 
     # FIXME : those line breaks are not preserved in the help message.
     # This is probably due to the built-in formatter.

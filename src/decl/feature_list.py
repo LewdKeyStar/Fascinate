@@ -12,37 +12,15 @@ from src.types.parameters.FeatureParameterChoices import FeatureParameterChoices
 
 from src.types.settings.FeatureSettingDefaultValues import FeatureSettingDefaultValues
 
+from src.parser_namespace import runtime_value, is_enabled_at_runtime
+
+from src.decl.feature_decl_utils import (
+    eq_filter_parameters
+)
+
 # A declarative list of features for the script.
 # Once a feature is declared here and implemented as its filter function,
 # It will automatically become available.
-
-def eq_filter_parameters(suffix):
-
-    param_name_list = [
-        "contrast",
-        "brightness",
-        "saturation",
-        "gamma",
-        "gamma_r",
-        "gamma_g",
-        "gamma_b",
-        "gamma_weight"
-    ]
-
-    return [
-        FeatureParameter(
-            name,
-            special_shorthand = "sat" if name == "saturation" else None, # avoid conflict with start_at
-            type = float,
-            range = FeatureParameterRange(
-                getattr(src.constants, f"MIN_EQ_{name.upper()}_{suffix}"),
-                getattr(src.constants, f"MAX_EQ_{name.upper()}_{suffix}")
-            ),
-            default = getattr(src.constants, f"DEFAULT_EQ_{name.upper()}_{suffix}")
-        )
-
-        for name in param_name_list
-    ]
 
 features: list[Feature] = [
 
@@ -312,15 +290,15 @@ features: list[Feature] = [
 
                 default = DEFAULT_ZOOM_CENTER_X,
 
-                unit = lambda args: (
-                    "" if getattr(args, "zoom_center_x") == DEFAULT_ZOOM_CENTER_X
-                    else "%" if getattr(args, "zoom_relative_mode")
+                unit = lambda value: (
+                    "" if runtime_value("zoom", "center_x") == DEFAULT_ZOOM_CENTER_X
+                    else "%" if is_enabled_at_runtime("zoom", "relative_mode")
                     else "px"
                 ),
 
                 renamed_values = {DEFAULT_ZOOM_CENTER_X: "center"},
-                value_format = lambda args, value: (
-                    int(value) if not getattr(args, "zoom_relative_mode")
+                value_format = lambda value: (
+                    int(value) if not is_enabled_at_runtime("zoom", "relative_mode")
                     else int(100*value)
                 )
             ),
@@ -332,15 +310,15 @@ features: list[Feature] = [
 
                 default = DEFAULT_ZOOM_CENTER_Y,
 
-                unit = lambda args: (
-                    "" if getattr(args, "zoom_center_y") == DEFAULT_ZOOM_CENTER_Y
-                    else "%" if getattr(args, "zoom_relative_mode")
+                unit = lambda value: (
+                    "" if runtime_value("zoom", "center_y") == DEFAULT_ZOOM_CENTER_Y
+                    else "%" if is_enabled_at_runtime("zoom", "relative_mode")
                     else "px"
                 ),
 
                 renamed_values = {DEFAULT_ZOOM_CENTER_Y: "center"},
-                value_format = lambda args, value: (
-                    int(value) if not getattr(args, "zoom_relative_mode")
+                value_format = lambda value: (
+                    int(value) if not is_enabled_at_runtime("zoom", "relative_mode")
                     else int(100*value)
                 )
             ),
@@ -359,9 +337,9 @@ features: list[Feature] = [
 # A util function that enforces the priority values given by users at call time.
 # Used for the order of feature application, and the order of feature sections in the output name.
 
-def prioritized_features(args):
+def prioritized_features():
     return sorted(
         features,
-        key = lambda f: getattr(args, f"{f.name}_priority"),
+        key = lambda f: runtime_value(f"{f.name}", "priority"),
         reverse = True
     )
