@@ -14,7 +14,13 @@ from src.types.settings.FeatureSettingDefaultValues import FeatureSettingDefault
 
 from src.parser_namespace import runtime_value, is_enabled_at_runtime
 
-from src.decl.feature_decl_utils import (
+from src.decl.utils.common_decl_utils import (
+    percentage_format,
+    relative_format,
+    percentage_unit
+)
+
+from src.decl.utils.feature_decl_utils import (
     eq_filter_parameters
 )
 
@@ -166,21 +172,30 @@ features: list[Feature] = [
             FeatureParameter(
                 "hue",
                 type = float,
-                range = FeatureParameterRange(MIN_HUE_SATURATION_HUE, MAX_HUE_SATURATION_HUE)
+                range = FeatureParameterRange(
+                    MIN_HUE_SATURATION_HUE,
+                    MAX_HUE_SATURATION_HUE
+                )
             ),
 
             FeatureParameter(
                 "saturation",
                 special_shorthand = "sat",
                 type = float,
-                range = FeatureParameterRange(MIN_HUE_SATURATION_SATURATION, MAX_HUE_SATURATION_SATURATION),
+                range = FeatureParameterRange(
+                    MIN_HUE_SATURATION_SATURATION,
+                    MAX_HUE_SATURATION_SATURATION
+                ),
                 default = DEFAULT_HUE_SATURATION_SATURATION
             ),
 
             FeatureParameter(
                 "brightness",
                 type = float,
-                range = FeatureParameterRange(MIN_HUE_SATURATION_BRIGHTNESS, MAX_HUE_SATURATION_BRIGHTNESS),
+                range = FeatureParameterRange(
+                    MIN_HUE_SATURATION_BRIGHTNESS,
+                    MAX_HUE_SATURATION_BRIGHTNESS
+                ),
             )
         ]
     ),
@@ -292,15 +307,11 @@ features: list[Feature] = [
 
                 unit = lambda value: (
                     "" if runtime_value("zoom", "center_x") == DEFAULT_ZOOM_CENTER_X
-                    else "%" if is_enabled_at_runtime("zoom", "relative_mode")
-                    else "px"
+                    else percentage_unit(if_is_relative = "zoom")
                 ),
 
                 renamed_values = {DEFAULT_ZOOM_CENTER_X: "center"},
-                value_format = lambda value: (
-                    int(value) if not is_enabled_at_runtime("zoom", "relative_mode")
-                    else int(100*value)
-                )
+                value_format = lambda value: relative_format(value, feature_name = "zoom")
             ),
             FeatureParameter(
                 "center_y",
@@ -312,15 +323,11 @@ features: list[Feature] = [
 
                 unit = lambda value: (
                     "" if runtime_value("zoom", "center_y") == DEFAULT_ZOOM_CENTER_Y
-                    else "%" if is_enabled_at_runtime("zoom", "relative_mode")
-                    else "px"
+                    else percentage_unit(if_is_relative = "zoom")
                 ),
 
                 renamed_values = {DEFAULT_ZOOM_CENTER_Y: "center"},
-                value_format = lambda value: (
-                    int(value) if not is_enabled_at_runtime("zoom", "relative_mode")
-                    else int(100*value)
-                )
+                value_format = lambda value: relative_format(value, feature_name = "zoom")
             ),
             FeatureParameter(
                 "relative_mode",

@@ -9,6 +9,17 @@ from src.types.settings.FeatureSettingChoices import FeatureSettingChoices
 
 from src.parser_namespace import runtime_value, is_enabled_at_runtime
 
+from src.decl.utils.common_decl_utils import (
+    percentage_format,
+    relative_format,
+    percentage_unit
+)
+
+from src.decl.utils.setting_decl_utils import (
+    crop_corner_mode_enabled,
+    crop_center_mode_enabled
+)
+
 from math import floor, modf
 
 # A declarative list of filter enable settings,
@@ -88,7 +99,7 @@ enable_settings: list[FeatureEnableSetting] = [
             runtime_value(feature_name, "bpm") > 0
         ),
 
-        value_format = lambda feature_name, value: int(100*value)
+        value_format = lambda feature_name, value: percentage_format(value)
     )
 ]
 
@@ -106,7 +117,7 @@ filter_bearing_video_settings: list[FilterBearingFeatureVideoSetting] = [
 
         include_in_filename = lambda feature_name, value: value < 1.0,
 
-        value_format = lambda feature_name, value: int(100*value)
+        value_format = lambda feature_name, value: percentage_format(value)
     ),
 
     FilterBearingFeatureVideoSetting(
@@ -266,7 +277,7 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
             is_enabled_at_runtime(f"{feature_name}", "fade_cyclical_sync")
         ),
 
-        value_format = lambda feature_name, value: int(100*value)
+        value_format = lambda feature_name, value: percentage_format(value)
     ),
 
     FilterLessFeatureVideoSetting(
@@ -281,11 +292,8 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
             is_enabled_at_runtime(f"{feature_name}", "fade_cyclical_sync")
         ),
 
-        value_format = lambda feature_name, value: int(100*value)
+        value_format = lambda feature_name, value: percentage_format(value)
     ),
-
-    # Behold : the shining example of how bad the variable signature system is.
-    # Holy duplication, Batman!
 
     FilterLessFeatureVideoSetting(
         name = "crop_top",
@@ -295,20 +303,14 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
         default = -1,
 
         unit = lambda feature_name, value: (
-            "%" if is_enabled_at_runtime(f"{feature_name}", "crop_relative_mode")
-            else "px"
+            percentage_unit(if_is_relative = f"{feature_name}_crop")
         ),
 
         value_format = lambda feature_name, value: (
-            int(value) if not is_enabled_at_runtime(f"{feature_name}", "crop_relative_mode")
-            else int(100*value)
+            relative_format(value, feature_name = f"{feature_name}_crop")
         ),
 
-        include_in_filename = lambda feature_name, value: (
-            is_enabled_at_runtime(f"{feature_name}", "crop")
-            and
-            not is_enabled_at_runtime(f"{feature_name}", "crop_center_mode")
-        )
+        include_in_filename = crop_corner_mode_enabled
     ),
 
     FilterLessFeatureVideoSetting(
@@ -319,20 +321,14 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
         default = -1,
 
         unit = lambda feature_name, value: (
-            "%" if is_enabled_at_runtime(f"{feature_name}", "crop_relative_mode")
-            else "px"
+            percentage_unit(if_is_relative = f"{feature_name}_crop")
         ),
 
         value_format = lambda feature_name, value: (
-            int(value) if not is_enabled_at_runtime(f"{feature_name}", "crop_relative_mode")
-            else int(100*value)
+            relative_format(value, feature_name = f"{feature_name}_crop")
         ),
 
-        include_in_filename = lambda feature_name, value: (
-            is_enabled_at_runtime(f"{feature_name}", "crop")
-            and
-            not is_enabled_at_runtime(f"{feature_name}", "crop_center_mode")
-        )
+        include_in_filename = crop_corner_mode_enabled
     ),
 
     FilterLessFeatureVideoSetting(
@@ -343,20 +339,14 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
         default = -1,
 
         unit = lambda feature_name, value: (
-            "%" if is_enabled_at_runtime(f"{feature_name}", "crop_relative_mode")
-            else "px"
+            percentage_unit(if_is_relative = f"{feature_name}_crop")
         ),
 
         value_format = lambda feature_name, value: (
-            int(value) if not is_enabled_at_runtime(f"{feature_name}", "crop_relative_mode")
-            else int(100*value)
+            relative_format(value, feature_name = f"{feature_name}_crop")
         ),
 
-        include_in_filename = lambda feature_name, value: (
-            is_enabled_at_runtime(f"{feature_name}", "crop")
-            and
-            not is_enabled_at_runtime(f"{feature_name}", "crop_center_mode")
-        )
+        include_in_filename = crop_corner_mode_enabled
     ),
 
     FilterLessFeatureVideoSetting(
@@ -367,20 +357,14 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
         default = -1,
 
         unit = lambda feature_name, value: (
-            "%" if is_enabled_at_runtime(f"{feature_name}", "crop_relative_mode")
-            else "px"
+            percentage_unit(if_is_relative = f"{feature_name}_crop")
         ),
 
         value_format = lambda feature_name, value: (
-            int(value) if not is_enabled_at_runtime(f"{feature_name}", "crop_relative_mode")
-            else int(100*value)
+            relative_format(value, feature_name = f"{feature_name}_crop")
         ),
 
-        include_in_filename = lambda feature_name, value: (
-            is_enabled_at_runtime(f"{feature_name}", "crop")
-            and
-            not is_enabled_at_runtime(f"{feature_name}", "crop_center_mode")
-        )
+        include_in_filename = crop_corner_mode_enabled
     ),
 
     FilterLessFeatureVideoSetting(
@@ -391,20 +375,14 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
         default = -1,
 
         unit = lambda feature_name, value: (
-            "%" if is_enabled_at_runtime(f"{feature_name}", "crop_relative_mode")
-            else "px"
+            percentage_unit(if_is_relative = f"{feature_name}_crop")
         ),
 
         value_format = lambda feature_name, value: (
-            int(value) if not is_enabled_at_runtime(f"{feature_name}", "crop_relative_mode")
-            else int(100*value)
+            relative_format(value, feature_name = f"{feature_name}_crop")
         ),
 
-        include_in_filename = lambda feature_name, value: (
-            is_enabled_at_runtime(f"{feature_name}", "crop")
-            and
-            is_enabled_at_runtime(f"{feature_name}", "crop_center_mode")
-        )
+        include_in_filename = crop_center_mode_enabled
     ),
 
     FilterLessFeatureVideoSetting(
@@ -415,20 +393,14 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
         default = -1,
 
         unit = lambda feature_name, value: (
-            "%" if is_enabled_at_runtime(f"{feature_name}", "crop_relative_mode")
-            else "px"
+            percentage_unit(if_is_relative = f"{feature_name}_crop")
         ),
 
         value_format = lambda feature_name, value: (
-            int(value) if not is_enabled_at_runtime(f"{feature_name}", "crop_relative_mode")
-            else int(100*value)
+            relative_format(value, feature_name = f"{feature_name}_crop")
         ),
 
-        include_in_filename = lambda feature_name, value: (
-            is_enabled_at_runtime(f"{feature_name}", "crop")
-            and
-            is_enabled_at_runtime(f"{feature_name}", "crop_center_mode")
-        )
+        include_in_filename = crop_center_mode_enabled
     ),
 
     FilterLessFeatureVideoSetting(
@@ -439,20 +411,14 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
         default = -1,
 
         unit = lambda feature_name, value: (
-            "%" if is_enabled_at_runtime(f"{feature_name}", "crop_relative_mode")
-            else "px"
+            percentage_unit(if_is_relative = f"{feature_name}_crop")
         ),
 
         value_format = lambda feature_name, value: (
-            int(value) if not is_enabled_at_runtime(f"{feature_name}", "crop_relative_mode")
-            else int(100*value)
+            relative_format(value, feature_name = f"{feature_name}_crop")
         ),
 
-        include_in_filename = lambda feature_name, value: (
-            is_enabled_at_runtime(f"{feature_name}", "crop")
-            and
-            is_enabled_at_runtime(f"{feature_name}", "crop_center_mode")
-        )
+        include_in_filename = crop_center_mode_enabled
     ),
 
     FilterLessFeatureVideoSetting(
@@ -463,20 +429,14 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
         default = -1,
 
         unit = lambda feature_name, value: (
-            "%" if is_enabled_at_runtime(f"{feature_name}", "crop_relative_mode")
-            else "px"
+            percentage_unit(if_is_relative = f"{feature_name}_crop")
         ),
 
         value_format = lambda feature_name, value: (
-            int(value) if not is_enabled_at_runtime(f"{feature_name}", "crop_relative_mode")
-            else int(100*value)
+            relative_format(value, feature_name = f"{feature_name}_crop")
         ),
 
-        include_in_filename = lambda feature_name, value: (
-            is_enabled_at_runtime(f"{feature_name}", "crop")
-            and
-            is_enabled_at_runtime(f"{feature_name}", "crop_center_mode")
-        )
+        include_in_filename = crop_center_mode_enabled
     ),
 
     FilterLessFeatureVideoSetting(
