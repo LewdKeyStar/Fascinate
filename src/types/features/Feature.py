@@ -52,7 +52,7 @@ class Feature(Shortenable):
     can_receive_enable_settings: bool = True
     can_receive_video_settings: bool = True
 
-    default_setting_values: FeatureSettingDefaultValues = FeatureSettingDefaultValues()
+    default_setting_values: FeatureSettingDefaultValues = field(default_factory=FeatureSettingDefaultValues)
     parameters: list[FeatureParameter] = field(default_factory=list)
 
     video_info_used_in_filter: list[str] = field(default_factory=list)
