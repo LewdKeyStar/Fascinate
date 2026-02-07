@@ -21,8 +21,8 @@ from src.decl.filter_settings_list import (
 )
 
 import src.impl.feature_filters
-import src.impl.filter_video_settings
-from src.impl.filter_enable_settings import * # TODO : automate those too through the same kind of list iteration
+import src.impl.settings.video_settings_impl
+from src.impl.settings.enable_settings_impl import * # TODO : automate those too through the same kind of list iteration
 
 from src.impl.misc_filters import (
     split_filter,
@@ -164,7 +164,7 @@ class Feature(Shortenable):
         if setting_name not in valid_video_setting_filter_names:
             raise ValueError("Invalid video setting :", setting_name)
 
-        return getattr(src.impl.filter_video_settings, f"{setting_name}_filter")
+        return getattr(src.impl.settings.video_settings_impl, f"{setting_name}_filter")
 
     # I don't particularly like having ffmpeg-related strings in this submodule.
     # They're not *technically* part of the FFMPEG filtergraph, but...still.

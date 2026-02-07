@@ -17,6 +17,9 @@ from src.decl.utils.setting_decl_utils import (
     crop_center_mode_enabled
 )
 
+# These video settings do not give rise to filter strings implementations.
+# They are used for other purposes, most often as input for filter-bearing video settings.
+
 filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
 
     FilterLessFeatureVideoSetting(

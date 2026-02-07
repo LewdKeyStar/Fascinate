@@ -4,6 +4,8 @@ from src.types.settings.FeatureMetaSetting import FeatureMetaSetting
 # They are not applied on feature call ; rather, they give information about the feature
 # To higher-level parts of the program.
 
+# For this reason, meta settings do not result in a filterstr implementation.
+
 meta_settings: list[FeatureMetaSetting] = [
     FeatureMetaSetting(
         name = "priority",
