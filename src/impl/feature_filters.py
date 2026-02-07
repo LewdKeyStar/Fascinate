@@ -105,10 +105,11 @@ def frame_randomizer_filter(
     )
 
 def afterimages_filter(
-    afterimages_start_white,
-
     afterimages_amount,
     afterimages_delay,
+
+    afterimages_start_white,
+    afterimages_extend,
 
     afterimages_alpha
 ):
@@ -142,16 +143,19 @@ def afterimages_filter(
             else ''
         )
 
+    def should_extend():
+        return f"shortest={'0' if afterimages_extend else '1'}"
+
     return (
         f"{pre_format()}"
         f"split={afterimages_amount+2}[before_afterimages_pre][before_afterimages_post]{''.join([f'[clone{i}]' for i in amount_range()])};"
         f'''{''.join([
             f"[clone{i}]tpad=start={i*afterimages_delay}:color={TRANSPARENT_FFMPEG_COLOR}[afterimage{i}];"
             f"[afterimage{i}]format=argb,colorchannelmixer=aa={afterimages_alpha}[afterimage{i}_alpha];"
-            f"[{overlay_step(i-1)}][afterimage{i}_alpha]overlay{hide_when_white(i)}[{overlay_step(i)}];"
+            f"[{overlay_step(i-1)}][afterimage{i}_alpha]overlay{hide_when_white(i)}:{should_extend()}[{overlay_step(i)}];"
             for i in amount_range()
         ])}'''
-        f"[before_afterimages_post][{overlay_step(afterimages_amount)}]overlay"
+        f"[before_afterimages_post][{overlay_step(afterimages_amount)}]overlay={should_extend()}"
     )
 
 def speed_change_filter(

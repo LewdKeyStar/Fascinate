@@ -120,9 +120,20 @@ features: list[Feature] = [
         }),
 
         parameters = (
-            FeatureParameter("start_white", special_shorthand = "w", type = bool, default = DEFAULT_AFTERIMAGES_START_WHITE),
             FeatureParameter("amount", special_shorthand = "m", default = DEFAULT_AFTERIMAGES_AMOUNT),
-            FeatureParameter("delay", default = DEFAULT_AFTERIMAGES_DELAY)
+            FeatureParameter("delay", default = DEFAULT_AFTERIMAGES_DELAY),
+            FeatureParameter(
+                "start_white",
+                special_shorthand = "w",
+                type = bool,
+                default = DEFAULT_AFTERIMAGES_START_WHITE
+            ),
+            FeatureParameter(
+                "extend",
+                special_shorthand = "x",
+                type = bool,
+                default = DEFAULT_AFTERIMAGES_EXTEND
+            )
         ),
 
         settings_used_in_filter = ["alpha"]

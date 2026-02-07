@@ -338,10 +338,11 @@ class Feature(Shortenable):
         return (
             filterstr
             + filter_option_separator(
-                is_first_option = (
-                    self.combine_mode == FeatureCombineMode.PRE_MERGED
-                    or should_apply_overlay_affixes()
-                )
+                is_first_option = should_apply_overlay_affixes()
+                # QUESTION : there used to be a special case here for premerged filters,
+                # Whereby they would specify enable conds as their first (filter=enable=)
+                # But this is no longer needed...for now.
+                # What to do if that resurfaces, though?
             )
         )
 
