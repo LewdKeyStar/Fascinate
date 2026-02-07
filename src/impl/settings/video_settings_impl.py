@@ -1,4 +1,7 @@
-from src.impl.misc_filters import fade_in_filter_generic, fade_out_filter_generic
+from src.impl.utils.video_settings_utils import (
+    fade_in_filter_generic,
+    fade_out_filter_generic
+)
 from src.utils.filter_utils import filter_separator
 
 def alpha_filter(alpha):

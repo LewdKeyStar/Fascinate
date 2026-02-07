@@ -6,7 +6,7 @@ from src.constants import (
     TRANSPARENT_FFMPEG_COLOR
 )
 
-from src.impl.misc_filters import (
+from src.impl.utils.feature_utils import (
     yuva420p_format_filter,
     eq_filter
 )
