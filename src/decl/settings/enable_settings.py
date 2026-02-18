@@ -5,9 +5,7 @@ from src.types.settings.FeatureSettingRange import FeatureSettingRange
 
 from src.parser_namespace import runtime_value, is_enabled_at_runtime
 
-from src.decl.utils.common_decl_utils import percentage_format
-
-from math import modf
+from src.decl.utils.common_decl_utils import percentage_format, conditional_int
 
 # A declarative list of filter enable settings,
 # And the respective conditions for which they are considered "active".
@@ -68,10 +66,7 @@ enable_settings: list[FeatureEnableSetting] = [
 
         include_in_filename = lambda feature_name, value: value > 0,
 
-        value_format = lambda feature_name, value: (
-            int(value) if modf(value)[0] == 0
-            else value
-        )
+        value_format = lambda feature_name, value: conditional_int(value)
     ),
 
     FeatureEnableSetting(
