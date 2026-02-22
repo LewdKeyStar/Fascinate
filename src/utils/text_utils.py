@@ -8,6 +8,7 @@ def to_camel(pascal):
     return "".join(
         letter.lower() if ( # Inside a word, meaning :
             i == 0 or # First letter : lowercase with no leading underscore
+            letter.isnumeric() or # Digits : don't start words, stay unchanged
             letter.islower() or # Non-first letters : stay lowercase
             (letter.isupper() and i < len(pascal) - 1 and pascal[i+1].isupper())
             # Acronyms : last for as long as the next letter is also uppercase

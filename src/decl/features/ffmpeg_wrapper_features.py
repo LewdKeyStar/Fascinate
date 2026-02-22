@@ -13,9 +13,7 @@ from src.types.settings.FeatureSettingDefaultValues import FeatureSettingDefault
 
 from src.parser_namespace import runtime_value
 
-from src.decl.utils.feature_decl_utils import (
-    eq_filter_parameters
-)
+from src.decl.utils.wrapper_feature_decl_utils import eq_filter_parameters
 
 ffmpeg_wrapper_features: list[FFMPEGWrapperFeature] = [
     FFMPEGWrapperFeature(
