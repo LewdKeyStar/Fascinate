@@ -77,7 +77,7 @@ custom_features: list[CustomFeature] = [
             ),
             FeatureParameter(
                 "extend",
-                special_shorthand = "x",
+                special_shorthand = "xt",
                 type = bool,
                 default = DEFAULT_AFTERIMAGES_EXTEND
             )
