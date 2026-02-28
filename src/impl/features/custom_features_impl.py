@@ -2,11 +2,22 @@ from src.impl.utils.enable_settings_utils import interval_total_length
 
 from src.constants import (
     DEFAULT_ZOOM_CENTER_X, DEFAULT_ZOOM_CENTER_Y,
+    DEFAULT_INTERSPERSE_UNSCALED_X, DEFAULT_INTERSPERSE_UNSCALED_Y,
     VALID_AXES, VALID_COLORS,
     TRANSPARENT_FFMPEG_COLOR
 )
 
 from src.impl.utils.feature_utils import yuva420p_format_filter
+
+# Yucky !
+# This shouldn't need to be here, but we need it for intersperse :
+# - get_resolution to center the unscaled movie,
+# - get_duration for its extend option.
+
+from src.utils.ffprobe_utils import (
+    get_resolution,
+    get_duration
+)
 
 def shake_filter(
     shake_axis,
@@ -118,7 +129,7 @@ def afterimages_filter(
             else ''
         )
 
-    def should_extend():
+    def conditional_extend(should_extend):
         return f"shortest={'0' if afterimages_extend else '1'}"
 
     return (
@@ -127,10 +138,10 @@ def afterimages_filter(
         f'''{''.join([
             f"[clone{i}]tpad=start={i*afterimages_delay}:color={TRANSPARENT_FFMPEG_COLOR}[afterimage{i}];"
             f"[afterimage{i}]format=argb,colorchannelmixer=aa={afterimages_alpha}[afterimage{i}_alpha];"
-            f"[{overlay_step(i-1)}][afterimage{i}_alpha]overlay{hide_when_white(i)}:{should_extend()}[{overlay_step(i)}];"
+            f"[{overlay_step(i-1)}][afterimage{i}_alpha]overlay{hide_when_white(i)}:{conditional_extend()}[{overlay_step(i)}];"
             for i in amount_range()
         ])}'''
-        f"[before_afterimages_post][{overlay_step(afterimages_amount)}]overlay={should_extend()}"
+        f"[before_afterimages_post][{overlay_step(afterimages_amount)}]overlay={conditional_extend()}"
     )
 
 def speed_change_filter(
@@ -158,4 +169,132 @@ def speed_change_filter_audio_component(
         f"formant={'shifted' if not speed_change_preserve_formants else 'preserved'}:"
         f"pitchq=quality:"
         f"channels=together"
+    )
+
+# FIXME : seek_point doesn't work, NO MATTER WHAT. It just doesn't seek.
+# I wonder if this is a recently introduced bug,
+# Or just an old one that goes unsolved,
+# if only just because people consider the movie filter to be bad practice.
+
+# TODO : it might be impossible to also add the overlay's audio,
+# Unless we resort to filter_complex.
+
+def intersperse_filter(
+    intersperse_source,
+
+    intersperse_scale,
+    intersperse_unscaled_x,
+    intersperse_unscaled_y,
+    intersperse_relative_mode,
+
+    intersperse_start_frame,
+    intersperse_start_delay,
+    intersperse_loop,
+    intersperse_extend,
+
+    intersperse_alpha,
+
+    res,
+    fps,
+    duration
+):
+
+    def conditional_scale():
+        return (
+            (
+                f"[over]scale=size={res}[over_scaled];"
+                f"[over_scaled]"
+            )
+            if intersperse_scale
+            else '[over]'
+        )
+
+    width, height = map(int, res.split("x"))
+
+    if intersperse_unscaled_x == DEFAULT_INTERSPERSE_UNSCALED_X:
+        intersperse_unscaled_x = (
+            width / 2
+            if not intersperse_relative_mode
+            else 0.5
+        )
+
+    if intersperse_unscaled_y == DEFAULT_INTERSPERSE_UNSCALED_Y:
+        intersperse_unscaled_y = (
+            height / 2
+            if not intersperse_relative_mode
+            else 0.5
+        )
+
+    if intersperse_relative_mode:
+
+        intersperse_unscaled_x *= width
+        intersperse_unscaled_y *= height
+
+    movie_width, movie_height = map(int, get_resolution(intersperse_source).split("x"))
+
+    # Because these are X/Y params for the overlay, they concern the top left corner,
+    # Not the center.
+    # For the same reason, their lowest value is 0.
+    # This means that the center cannot be brought closer to 0.25* the main video's dimensions,
+    # No matter what we do.
+    # Ah well. Not like this is gonna be used a lot.
+
+    overlay_x = intersperse_unscaled_x - (movie_width / 2) if not intersperse_scale else 0
+    overlay_y = intersperse_unscaled_y - (movie_height / 2) if not intersperse_scale else 0
+
+    # This is simpler than calculating the number of loops.
+    # Note, however, that it ONLY works with the setpts hack below,
+    # Otherwise, the ffmpeg process never terminates!
+
+    def loop_count():
+
+        return (
+            "0" if intersperse_loop
+            else "1"
+        )
+
+    # The hack in question, graciously provided by :
+    # >> https://superuser.com/questions/1093507/loop-a-video-overlay-with-ffmpeg <<
+
+    # Okay, so convert the frame number to seconds, and then...
+    # ...I have *no idea* what TB does here.
+
+    # The ffmpeg docs refer to it as a "time base".
+    # Does that mean it converts the (cyclical) second timestamps of the secondary input
+    # Into monotonic timestamps based on those of the main input (the "base" input) ?
+    # That's my best guess. We don't have another explanation.
+    # Whatever the case, it works, so let's not complain.
+
+    def setpts_loop_hack():
+        return "setpts=N/FRAME_RATE/TB"
+
+    # shortest=1 will freeze the main video if the interspersed movie terminates.
+    # This seems to mean that, without any such indication from the ffmpeg docs,
+    # shortest overrides BOTH eof_action and repeatlast.
+
+    # To avoid this, shortest is only triggered, not only if extend is false
+    # (which is the default, as is appropriate for us)
+    # but if the interspersed movie also DOES extend beyond the main vid,
+    # At which point it doesn't run the risk of terminating early and freezing it.
+
+    movie_duration = get_duration(intersperse_source)
+    padded_movie_duration = movie_duration + intersperse_start_delay
+
+    is_movie_shorter = padded_movie_duration < duration
+
+    def conditional_extend():
+        return f"shortest={'0' if intersperse_extend or is_movie_shorter else '1'}"
+
+    return (
+        f"null[main];"
+        f"movie=filename={intersperse_source}:"
+        f"seek_point={intersperse_start_frame / fps}:"
+        f"loop={loop_count()}[over];"
+        f"{conditional_scale()}"
+        f"tpad=start={intersperse_start_delay}:color={TRANSPARENT_FFMPEG_COLOR}[over_padded];"
+        f"[over_padded]format=argb,colorchannelmixer=aa={intersperse_alpha}[over_alpha];"
+        f"[over_alpha]{setpts_loop_hack()}[over_adjusted];"
+        f"[main][over_adjusted]overlay="
+        f"x={overlay_x}:y={overlay_y}:"
+        f"eof_action=pass:repeatlast=0:{conditional_extend()}"
     )

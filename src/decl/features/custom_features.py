@@ -18,6 +18,8 @@ from src.decl.utils.common_decl_utils import (
     percentage_unit
 )
 
+from os.path import sep
+
 custom_features: list[CustomFeature] = [
     CustomFeature(
         name = "speed_change",
@@ -181,5 +183,110 @@ custom_features: list[CustomFeature] = [
         ],
 
         video_info_used_in_filter = ["resolution", "fps"]
+    ),
+
+    CustomFeature(
+        name = "intersperse",
+        special_shorthand = "isp",
+
+        # Because of how the movie filter works, this filter has to pre-merge its alpha.
+        combine_mode = FeatureCombineMode.PRE_MERGED,
+
+        parameters = [
+
+            FeatureParameter(
+                "source",
+                special_shorthand = "so",
+                type = str,
+
+                # This means not specifying the source will lead to an error.
+                default = "",
+
+                value_format = lambda value: value.replace(sep, "+")
+            ),
+
+            FeatureParameter(
+                "scale",
+                special_shorthand = "sc",
+
+                type = bool,
+                default = DEFAULT_INTERSPERSE_SCALE
+            ),
+
+            FeatureParameter(
+                "unscaled_x",
+                special_shorthand = "x",
+
+                type = float,
+                default = DEFAULT_INTERSPERSE_UNSCALED_X,
+
+                unit = lambda value: (
+                    "" if runtime_value("intersperse", "unscaled_x") == DEFAULT_INTERSPERSE_UNSCALED_X
+                    else percentage_unit(if_is_relative = "intersperse")
+                ),
+
+                renamed_values = {DEFAULT_INTERSPERSE_UNSCALED_X: "center"},
+                value_format = lambda value: relative_format(value, feature_name = "intersperse")
+            ),
+
+            FeatureParameter(
+                "unscaled_y",
+                special_shorthand = "y",
+
+                type = float,
+                default = DEFAULT_INTERSPERSE_UNSCALED_Y,
+
+                unit = lambda value: (
+                    "" if runtime_value("intersperse", "unscaled_y") == DEFAULT_INTERSPERSE_UNSCALED_Y
+                    else percentage_unit(if_is_relative = "intersperse")
+                ),
+
+                renamed_values = {DEFAULT_INTERSPERSE_UNSCALED_Y: "center"},
+                value_format = lambda value: relative_format(value, feature_name = "intersperse")
+            ),
+
+            FeatureParameter(
+                "relative_mode",
+                type = bool,
+                default = DEFAULT_INTERSPERSE_RELATIVE_MODE,
+                include_in_filename = False
+            ),
+
+            # This parameter is for use with the seek_point option of movie,
+            # Reading the stream only from the given frame.
+            # However, seek_point does not work,
+            # so in effect, this parameter does nothing.
+
+            FeatureParameter(
+                "start_frame",
+                type = int
+            ),
+
+            # This parameter time-pads the interspersed movie for the given amount of frames.
+            # This allows for a start_at that actually starts on frame 0 of the movie.
+
+            FeatureParameter(
+                "start_delay",
+                type = int
+            ),
+
+            FeatureParameter(
+                "loop",
+                special_shorthand = "lp",
+                type = bool,
+                default = DEFAULT_INTERSPERSE_LOOP
+            ),
+
+            FeatureParameter(
+                "extend",
+                special_shorthand = "xt",
+                type = bool,
+                default = DEFAULT_INTERSPERSE_EXTEND
+            )
+        ],
+
+        settings_used_in_filter = ["alpha"],
+
+        video_info_used_in_filter = ["resolution", "fps", "duration"]
     )
 ]
