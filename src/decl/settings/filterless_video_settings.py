@@ -277,4 +277,15 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
 
         include_in_filename = False
     ),
+
+    FilterLessFeatureVideoSetting(
+        name = "crop_invert",
+        special_shorthand = "cri",
+        type = bool,
+        default = False,
+
+        include_in_filename = lambda feature_name, value: (
+            is_enabled_at_runtime(feature_name, "crop")
+        )
+    )
 ]

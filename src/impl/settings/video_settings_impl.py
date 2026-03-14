@@ -131,6 +131,8 @@ def crop_filter(
     crop_center_mode,
     crop_relative_mode,
 
+    crop_invert,
+
     resolution
 ):
 
@@ -335,15 +337,37 @@ def crop_filter(
     # Note : +1 is if the fade is 1 pixel...is that really useful, though?
     # Is anyone ever going to do this?
 
-    fade_coefficient_lr = (
+    base_fade_coefficient_lr = (
         f"((abs({edge_lr_outer_bound} - {distance_center_x()})) / {crop_edge_fade + 1})"
     )
 
-    fade_coefficient_tb = (
+    base_fade_coefficient_tb = (
         f"((abs({edge_tb_outer_bound} - {distance_center_y()})) / {crop_edge_fade + 1})"
     )
 
-    # Everything is ready.
+    # Finally, add a case disjunction for reversed crop.
+
+    alpha_value_outside = (
+        'p(X,Y)' if crop_invert
+        else '0'
+    )
+
+    alpha_value_inside = (
+        '0' if crop_invert
+        else 'p(X,Y)'
+    )
+
+    fade_coefficient_lr = (
+        f'1 - ({base_fade_coefficient_lr})' if crop_invert
+        else base_fade_coefficient_lr
+    )
+
+    fade_coefficient_tb = (
+        f'1 - ({base_fade_coefficient_tb})' if crop_invert
+        else base_fade_coefficient_tb
+    )
+
+    # Now, everything is ready.
 
     return (
         f"format=argb,"
@@ -356,9 +380,9 @@ def crop_filter(
                 f"between(X, {crop_left}, {crop_right})*"
                 f"between(Y, {crop_top}, {crop_bottom}),"
 
-                f"p(X,Y),"
+                f"{alpha_value_inside},"
                 f'''{
-                    '0' if crop_edge_fade == 0
+                    alpha_value_outside if crop_edge_fade == 0
                     else (
                         f'if('
                             f'{in_lr_edge()}+{in_lr_corner_halves()},'
@@ -366,11 +390,13 @@ def crop_filter(
                             f'if('
                                 f'{in_tb_edge()}*not({in_lr_corner_halves()}),'
                                 f'{fade_coefficient_tb}*p(X,Y),'
-                                '0'
+                                f'{alpha_value_outside}'
                             f')'
                         f')'
                     )
                 }'''
-            f")"
+            f"),"
+
+            f"{alpha_value_outside}"
         f")'"
     )
