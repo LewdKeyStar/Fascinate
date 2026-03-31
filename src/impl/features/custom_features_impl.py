@@ -129,7 +129,7 @@ def afterimages_filter(
             else ''
         )
 
-    def conditional_extend(should_extend):
+    def conditional_extend():
         return f"shortest={'0' if afterimages_extend else '1'}"
 
     return (
