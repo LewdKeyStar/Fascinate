@@ -1,3 +1,11 @@
+# For H.264 encoding :
+# This codec only accepts even dimensions,
+# Therefore, the input dimensions have to be preventively rounded
+# to the nearest even integer.
+
+def pad_mp4_filter():
+    return "pad=ceil(iw/2)*2:ceil(ih/2)*2"
+
 # For GIF management ;
 # Without a separate palette for each GIF frame, noticeable quantization noise appears.
 # The optimized thing to do would be to have two palettes : one for the normal frames, one for the inverted

@@ -6,12 +6,12 @@ import src.parser_namespace
 from src.types.VideoInfo import VideoInfo
 
 from src.decl.feature_list import features, prioritized_features
-from src.impl.misc_filters import palette_filter
+from src.impl.misc_filters import pad_mp4_filter, palette_filter
 
 from src.utils.parser_utils import register_feature
 from src.utils.filter_utils import chain_filters
 
-from src.utils.name_utils import is_gif, to_output_name
+from src.utils.name_utils import is_mp4, is_gif, to_output_name
 from src.constants import DEFAULT_OUTPUT
 
 def appropriate_filters(args, video_info):
@@ -22,6 +22,8 @@ def appropriate_filters(args, video_info):
             feature_filter(video_info)
             for feature_filter in prioritized_features()
          ],
+
+        pad_mp4_filter() if is_mp4(args["output"]) else "",
 
         palette_filter() if is_gif(args["output"]) else ""
     ]

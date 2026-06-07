@@ -51,5 +51,18 @@ def to_output_name(input_path):
         ]).rstrip("_") + input_ext
     )
 
+
+# TODO :
+# *Techknickhally*,
+# What we're interested in is knowing whether we're using the H264 codec,
+# Which can be used by other containers,
+# And which is not the only supported codec for the MP4 container
+# (There's also MPEG1, 2, H265...)
+
+# ...but how would we test for codecs ???
+
+def is_mp4(input_name):
+    return splitext(input_name)[1].lower() == ".mp4"
+
 def is_gif(input_name):
     return splitext(input_name)[1].lower() == ".gif"
