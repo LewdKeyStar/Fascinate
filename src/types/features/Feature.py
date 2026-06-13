@@ -175,6 +175,14 @@ class Feature(Shortenable):
 
         return getattr(src.impl.settings.video_settings_impl, f"{setting_name}_filter")
 
+    def get_video_info_value(self, video_info_name):
+
+        # Video info is not related to a feature,
+        # So there is no feature name prefix.
+        # The runtime_namespace methods account for this.
+
+        return runtime_value("", video_info_name)
+
     # I don't particularly like having ffmpeg-related strings in this submodule.
     # They're not *technically* part of the FFMPEG filtergraph, but...still.
     # It's out of place.
@@ -195,7 +203,7 @@ class Feature(Shortenable):
     def filter_io_label_after_video_effects(self):
         return f"{self.name}_after_video_effects"
 
-    def feature_filterstr(self, video_info, audio = False):
+    def feature_filterstr(self, audio = False):
 
         component_function = (
             self.feature_filter
@@ -231,12 +239,12 @@ class Feature(Shortenable):
             ],
 
             *[
-                getattr(video_info, required_info)
+                self.get_video_info_value(required_info)
                 for required_info in self.video_info_used_in_filter
             ]
         )
 
-    def apply_enable_settings(self, video_info):
+    def apply_enable_settings(self):
         if not self.can_receive_enable_settings:
             return ''
 
@@ -271,7 +279,7 @@ class Feature(Shortenable):
             (self.combine_mode != FeatureCombineMode.MERGE or self.get_setting_value("alpha") != 1.0)
         )
 
-    def apply_video_settings(self, filterstr, video_info):
+    def apply_video_settings(self, filterstr):
 
         if not self.can_receive_video_settings:
             return filterstr
@@ -326,7 +334,7 @@ class Feature(Shortenable):
                     ],
 
                     *[
-                        getattr(video_info, required_info)
+                        self.get_video_info_value(required_info)
                         for required_info in video_setting.video_info_used_in_setting_filter
                     ]
                 )
@@ -355,7 +363,7 @@ class Feature(Shortenable):
             )
         )
 
-    def video_component(self, video_info):
+    def video_component(self):
 
         # FIXME : there is no better place to put this.
         # If we put it in apply_enable_settings, video settings can't use this information.
@@ -364,7 +372,7 @@ class Feature(Shortenable):
             bpm_pause_interval, bpm_active_interval = bpm_synced_intervals(
                 self.get_setting_value("bpm"),
                 self.get_setting_value("bpm_active_percent"),
-                video_info.fps,
+                self.get_video_info_value("fps"),
                 self.get_setting_value("start_at"),
                 self.get_setting_value("invert_pause")
             )
@@ -375,25 +383,22 @@ class Feature(Shortenable):
         return (
             (
                 self.apply_video_settings(
-                    self.feature_filterstr(video_info),
-                    video_info
+                    self.feature_filterstr()
                 )
             )
             +
             (
-                self.apply_enable_settings(
-                    video_info
-                )
+                self.apply_enable_settings()
             )
         )
 
-    def audio_component(self, video_info):
+    def audio_component(self):
         if not self.has_audio_component:
             return ''
 
-        return self.feature_filterstr(video_info, audio = True)
+        return self.feature_filterstr(audio = True)
 
-    def __call__(self, video_info, seeking_audio_component = False):
+    def __call__(self, seeking_audio_component = False):
 
         if not self.is_enabled:
             return ''
@@ -402,9 +407,9 @@ class Feature(Shortenable):
         self.check_setting_value_ranges()
 
         return (
-            self.video_component(video_info)
+            self.video_component()
             if not seeking_audio_component
-            else self.audio_component(video_info)
+            else self.audio_component()
         )
 
     @property

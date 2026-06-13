@@ -14,7 +14,7 @@ class Frei0rFeature(Feature):
         return getattr(self.impl_module, f"frei0r_filter")
 
     # Override
-    def feature_filterstr(self, video_info, audio = False):
+    def feature_filterstr(self, audio = False):
 
         if audio == True:
             raise ValueError("Audio component required from frei0r feature")

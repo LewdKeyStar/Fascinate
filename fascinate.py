@@ -14,12 +14,12 @@ from src.utils.filter_utils import chain_filters
 from src.utils.name_utils import is_mp4, is_gif, to_output_name
 from src.constants import DEFAULT_OUTPUT
 
-def appropriate_filters(args, video_info):
+def appropriate_filters(args):
 
     all_filters = [
 
         *[
-            feature_filter(video_info)
+            feature_filter()
             for feature_filter in prioritized_features()
          ],
 
@@ -30,13 +30,12 @@ def appropriate_filters(args, video_info):
 
     return chain_filters(all_filters)
 
-def appropriate_filter_audio_components(args, video_info):
+def appropriate_filter_audio_components(args):
     # this one doesn't actually use args, but for uniformity's sake...
 
     all_audio_components = [
 
         feature_filter(
-            video_info,
             seeking_audio_component = True
         )
 
@@ -82,6 +81,8 @@ def main():
 
     video_info = VideoInfo(args["input"])
 
+    src.parser_namespace.update_namespace_with_video_info(video_info)
+
     ff = FFmpeg(
         global_options = "-y",
         inputs = {args["input"]: None},
@@ -90,7 +91,6 @@ def main():
                 [
                 "-vf", appropriate_filters(
                     args, # Needed for is_gif
-                    video_info
                 )]
             )
             +
@@ -98,7 +98,6 @@ def main():
                 [
                     "-af", appropriate_filter_audio_components(
                         args, # Not needed, passed for uniformity
-                        video_info
                     )
                 ]
                 if any_audio_filters_enabled()
