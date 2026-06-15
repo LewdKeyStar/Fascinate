@@ -4,11 +4,13 @@ from src.types.features.Frei0rFeature import Frei0rFeature
 from src.types.parameters.FeatureParameter import FeatureParameter
 from src.types.parameters.FeatureParameterRange import FeatureParameterRange
 
-from src.decl.utils.frei0r_feature_decl_utils import (
+from src.decl.utils.argparse_types.frei0r_argparse_types import (
     frei0r_position,
-    frei0r_position_format,
-
     frei0r_color,
+)
+
+from src.decl.utils.frei0r_feature_decl_utils import (
+    frei0r_position_format,
     frei0r_color_format
 )
 
