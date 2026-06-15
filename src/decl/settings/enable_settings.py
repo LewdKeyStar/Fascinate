@@ -5,6 +5,7 @@ from src.types.settings.FeatureSettingRange import FeatureSettingRange
 
 from src.parser_namespace import option_runtime_value, is_enabled_at_runtime
 
+from src.decl.utils.argparse_types.common_argparse_types import video_time
 from src.decl.utils.common_decl_utils import percentage_format, conditional_int
 
 # A declarative list of filter enable settings,
@@ -14,12 +15,14 @@ from src.decl.utils.common_decl_utils import percentage_format, conditional_int
 enable_settings: list[FeatureEnableSetting] = [
     FeatureEnableSetting(
         name = "start_at",
+        type = video_time,
         include_in_filename = lambda feature_name, value: value > 0,
         special_shorthand = "s"
     ),
 
     FeatureEnableSetting(
         name = "end_at",
+        type = video_time,
         include_in_filename = lambda feature_name, value: value < UINT32_MAX,
         special_shorthand = "e",
         default = UINT32_MAX
@@ -27,6 +30,7 @@ enable_settings: list[FeatureEnableSetting] = [
 
     FeatureEnableSetting(
         name = "every",
+        # This HAS to be a frame count ! It makes no sense as a number of seconds.
         include_in_filename = lambda feature_name, value: value > 1,
         special_shorthand = "n",
         default = 1
@@ -34,11 +38,13 @@ enable_settings: list[FeatureEnableSetting] = [
 
     FeatureEnableSetting(
         name = "pause",
+        type = video_time,
         include_in_filename = lambda feature_name, value: value > 0
     ),
 
     FeatureEnableSetting(
         name = "active",
+        type = video_time,
         include_in_filename = lambda feature_name, value: value > 0
     ),
 

@@ -2,35 +2,65 @@ from argparse import Namespace
 
 from dataclasses import fields
 
+# This class ensures the namespace is a dict when necessary,
+# And vice versa.
+
+class SubscriptableNamespace:
+
+    def __init__(self, namespace):
+
+        self.temp_namespace = None
+
+    def __enter__(self):
+        global runtime_namespace
+
+        if not isinstance(runtime_namespace, dict):
+
+            runtime_namespace = vars(runtime_namespace)
+
+        return runtime_namespace
+
+    def __exit__(self, exception_type, exception_val, traceback):
+
+        global runtime_namespace
+
+        if isinstance(runtime_namespace, dict):
+
+            runtime_namespace = Namespace(**runtime_namespace)
+
 def init_namespace():
     global runtime_namespace
     runtime_namespace = Namespace()
 
 def update_namespace_with_video_info(video_info):
 
-    for info_field in fields(video_info):
+    with SubscriptableNamespace(runtime_namespace) as ns:
 
-        info_field_name = info_field.name
+        for info_field in fields(video_info):
 
-        runtime_namespace[info_field_name] = getattr(video_info, info_field_name)
+            info_field_name = info_field.name
+
+            ns[info_field_name] = getattr(video_info, info_field_name)
 
 def runtime_value(feature_name, option_or_property_name):
 
-    return (
+    with SubscriptableNamespace(runtime_namespace) as ns:
 
-        # Used to determine if a feature is active.
+        return (
 
-        runtime_namespace[feature_name]
-        if option_or_property_name == ""
+            # Used to determine if a feature is active.
 
-        # Used to get feature-independent runtime info,
-        # e.g. video info (resolution, fps, etc.)
+            ns[feature_name]
+            if option_or_property_name == ""
 
-        else runtime_namespace[option_or_property_name]
-        if feature_name == ""
+            # Used to get feature-independent runtime info,
+            # e.g. video info (resolution, fps, etc.)
 
-        else runtime_namespace[f"{feature_name}_{option_or_property_name}"]
-    )
+            else ns[option_or_property_name]
+            if feature_name == ""
+
+            else ns[f"{feature_name}_{option_or_property_name}"]
+        )
 
 # More explicit aliases for the rest of the codebase.
 
@@ -51,4 +81,7 @@ def is_enabled_at_runtime(feature_name, option_name = ""):
 # Use with great parcimony.
 
 def override_runtime_value(feature_name, option_name, option_value):
-    runtime_namespace[f"{feature_name}_{option_name}"] = option_value
+
+    with SubscriptableNamespace(runtime_namespace) as ns:
+
+        ns[f"{feature_name}_{option_name}"] = option_value
