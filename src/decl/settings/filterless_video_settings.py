@@ -6,6 +6,8 @@ from src.constants import VALID_FADE_FUNCTIONS, DEFAULT_FADE_FUNCTION
 
 from src.parser_namespace import is_enabled_at_runtime
 
+from src.decl.utils.argparse_types.common_argparse_types import video_time
+
 from src.decl.utils.common_decl_utils import (
     percentage_format,
     relative_format,
@@ -53,6 +55,7 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
 
     FilterLessFeatureVideoSetting(
         name = "fade_cyclical_peak",
+        type = video_time,
         include_in_filename = lambda feature_name, value: value > 0
     ),
 
@@ -60,6 +63,7 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
 
     FilterLessFeatureVideoSetting(
         name = "fade_cyclical_trough",
+        type = video_time,
         include_in_filename = lambda feature_name, value: value > 0
     ),
 

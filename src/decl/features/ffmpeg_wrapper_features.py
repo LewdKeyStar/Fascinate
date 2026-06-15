@@ -11,6 +11,7 @@ from src.types.parameters.FeatureParameterChoices import FeatureParameterChoices
 
 from src.types.settings.FeatureSettingDefaultValues import FeatureSettingDefaultValues
 
+from src.decl.utils.argparse_types.common_argparse_types import video_time
 from src.decl.utils.wrapper_feature_decl_utils import eq_filter_parameters
 
 ffmpeg_wrapper_features: list[FFMPEGWrapperFeature] = [
@@ -27,8 +28,10 @@ ffmpeg_wrapper_features: list[FFMPEGWrapperFeature] = [
         parameters = (
             FeatureParameter(
                 "duration",
+                type = video_time,
                 default = DEFAULT_FADE_DURATION
             ),
+
             FeatureParameter(
                 "color",
                 type = str,
@@ -52,8 +55,10 @@ ffmpeg_wrapper_features: list[FFMPEGWrapperFeature] = [
         parameters = (
             FeatureParameter(
                 "duration",
+                type = video_time,
                 default = DEFAULT_FADE_DURATION
             ),
+
             FeatureParameter(
                 "color",
                 type = str,
@@ -70,7 +75,13 @@ ffmpeg_wrapper_features: list[FFMPEGWrapperFeature] = [
         combine_mode = FeatureCombineMode.OVERLAY,
 
         parameters = [
-            FeatureParameter("max_frames", special_shorthand = "max", default = DEFAULT_RANDOMIZER_MAX_FRAMES),
+            FeatureParameter(
+                "max_frames",
+                type = video_time,
+                special_shorthand = "max",
+                default = DEFAULT_RANDOMIZER_MAX_FRAMES
+            ),
+            
             FeatureParameter("seed", special_shorthand = "sd")
         ]
     ),

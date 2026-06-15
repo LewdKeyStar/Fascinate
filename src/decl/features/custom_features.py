@@ -13,6 +13,8 @@ from src.types.settings.FeatureSettingDefaultValues import FeatureSettingDefault
 
 from src.parser_namespace import option_runtime_value
 
+from src.decl.utils.argparse_types.common_argparse_types import video_time
+
 from src.decl.utils.common_decl_utils import (
     relative_format,
     percentage_unit
@@ -69,14 +71,25 @@ custom_features: list[CustomFeature] = [
         }),
 
         parameters = (
-            FeatureParameter("amount", special_shorthand = "m", default = DEFAULT_AFTERIMAGES_AMOUNT),
-            FeatureParameter("delay", default = DEFAULT_AFTERIMAGES_DELAY),
+            FeatureParameter(
+                "amount",
+                special_shorthand = "m",
+                default = DEFAULT_AFTERIMAGES_AMOUNT
+            ),
+
+            FeatureParameter(
+                "delay",
+                type = video_time,
+                default = DEFAULT_AFTERIMAGES_DELAY
+            ),
+
             FeatureParameter(
                 "start_white",
                 special_shorthand = "w",
                 type = bool,
                 default = DEFAULT_AFTERIMAGES_START_WHITE
             ),
+            
             FeatureParameter(
                 "extend",
                 special_shorthand = "xt",

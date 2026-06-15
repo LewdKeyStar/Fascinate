@@ -1,6 +1,7 @@
 from src.types.settings.FilterBearingFeatureVideoSetting import FilterBearingFeatureVideoSetting
 from src.types.settings.FeatureSettingRange import FeatureSettingRange
 
+from src.decl.utils.argparse_types.common_argparse_types import video_time
 from src.decl.utils.common_decl_utils import percentage_format
 
 filter_bearing_video_settings: list[FilterBearingFeatureVideoSetting] = [
@@ -22,6 +23,7 @@ filter_bearing_video_settings: list[FilterBearingFeatureVideoSetting] = [
 
     FilterBearingFeatureVideoSetting(
         name = "fade_in",
+        type = video_time,
         include_in_filename = lambda feature_name, value: value > 0,
 
         requires_overlay = True,
@@ -39,6 +41,7 @@ filter_bearing_video_settings: list[FilterBearingFeatureVideoSetting] = [
 
     FilterBearingFeatureVideoSetting(
         name = "fade_out",
+        type = video_time,
         include_in_filename = lambda feature_name, value: value > 0,
 
         requires_overlay = True,
