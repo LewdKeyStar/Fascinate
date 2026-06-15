@@ -8,18 +8,40 @@ def video_time(string):
 
     seconds_value = None
 
-    if string.endswith("s") or "." in string:
+    # A valid video_time value is either (from most complex to simplest) :
 
-        float_literal = string.removesuffix("s")
+    # A. A timestamp string,
+    # Either in the format "[XX:]YY:ZZ.ff" or "[XXh][YYm][ZZ.ffs]"
 
-        try:
-            seconds_value = float(float_literal)
-        except:
-            raise ValueError("video_time : Invalid seconds value")
+    if ":" in string or any(sep in string for sep in ["h", "m", "s"]):
 
-    elif ":" in string: # timestamp string
+        # ...but not both !
 
-        timestamp_components = list(reversed(string.split(':')))
+        if ":" in string and any(sep in string for sep in ["h", "m", "s"]):
+
+            raise ValueError("video_time : Mixed timestamp format")
+
+        if ":" in string:
+
+            timestamp_components = list(reversed(string.split(':')))
+
+        else:
+
+            hour_component, remainder = (
+                string.split("h") if "h" in string else ("0", string)
+            )
+
+            minute_component, remainder = (
+                remainder.split("m") if "m" in remainder else ("0", remainder)
+            )
+
+            second_component = remainder.removesuffix("s")
+
+            timestamp_components = [
+                second_component,
+                minute_component,
+                hour_component
+            ]
 
         # we're gonna stop at hours. I think it's fine.
 
@@ -30,8 +52,6 @@ def video_time(string):
         try:
 
             timestamp_components[0] = float(timestamp_components[0]) # seconds can be floats,
-
-            print("Past first component")
 
             # the other components are ints.
 
@@ -54,12 +74,30 @@ def video_time(string):
             in zip(timestamp_components, timestamp_component_multipliers)
         )
 
-    else: # frame number. has to be a valid positive int.
+
+    # B. A float amount of seconds
+
+    elif "." in string:
+
+        float_literal = string.removesuffix("s")
+
+        try:
+            seconds_value = float(float_literal)
+        except:
+            raise ValueError("video_time : Invalid seconds value")
+
+    # Or C. a frame number, which has to be a valid positive int.
+
+    else:
 
         try:
             int(string)
         except:
             raise ValueError("video_time : Invalid frame number")
+
+    # --------------------------------------------------------------------------
+
+    # In the end, all those cases are collapsed back into a frame value.
 
     frame_number = (
         seconds_to_frame_number(seconds_value)
