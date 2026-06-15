@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from dataclasses import dataclass
 
-from src.parser_namespace import runtime_value
+from src.parser_namespace import option_runtime_value
 
 from src.types.features.Feature import Feature
 from src.types.abstract.options.FeatureOption import FeatureOption
@@ -14,7 +14,7 @@ class FeatureOptionFormatter(ABC):
 
     @property
     def option_value(self):
-        return runtime_value(self.feature.name, self.option.name)
+        return option_runtime_value(self.feature.name, self.option.name)
 
     @abstractmethod
     def _include_in_filename(self):

@@ -11,7 +11,7 @@ from src.types.parameters.FeatureParameterChoices import FeatureParameterChoices
 
 from src.types.settings.FeatureSettingDefaultValues import FeatureSettingDefaultValues
 
-from src.parser_namespace import runtime_value
+from src.parser_namespace import option_runtime_value
 
 from src.decl.utils.common_decl_utils import (
     relative_format,
@@ -151,7 +151,7 @@ custom_features: list[CustomFeature] = [
                 default = DEFAULT_ZOOM_CENTER_X,
 
                 unit = lambda value: (
-                    "" if runtime_value("zoom", "center_x") == DEFAULT_ZOOM_CENTER_X
+                    "" if option_runtime_value("zoom", "center_x") == DEFAULT_ZOOM_CENTER_X
                     else percentage_unit(if_is_relative = "zoom")
                 ),
 
@@ -167,7 +167,7 @@ custom_features: list[CustomFeature] = [
                 default = DEFAULT_ZOOM_CENTER_Y,
 
                 unit = lambda value: (
-                    "" if runtime_value("zoom", "center_y") == DEFAULT_ZOOM_CENTER_Y
+                    "" if option_runtime_value("zoom", "center_y") == DEFAULT_ZOOM_CENTER_Y
                     else percentage_unit(if_is_relative = "zoom")
                 ),
 
@@ -221,7 +221,7 @@ custom_features: list[CustomFeature] = [
                 default = DEFAULT_INTERSPERSE_UNSCALED_X,
 
                 unit = lambda value: (
-                    "" if runtime_value("intersperse", "unscaled_x") == DEFAULT_INTERSPERSE_UNSCALED_X
+                    "" if option_runtime_value("intersperse", "unscaled_x") == DEFAULT_INTERSPERSE_UNSCALED_X
                     else percentage_unit(if_is_relative = "intersperse")
                 ),
 
@@ -237,7 +237,7 @@ custom_features: list[CustomFeature] = [
                 default = DEFAULT_INTERSPERSE_UNSCALED_Y,
 
                 unit = lambda value: (
-                    "" if runtime_value("intersperse", "unscaled_y") == DEFAULT_INTERSPERSE_UNSCALED_Y
+                    "" if option_runtime_value("intersperse", "unscaled_y") == DEFAULT_INTERSPERSE_UNSCALED_Y
                     else percentage_unit(if_is_relative = "intersperse")
                 ),
 

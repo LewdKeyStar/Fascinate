@@ -3,7 +3,7 @@ from src.constants import UINT32_MAX
 from src.types.settings.FeatureEnableSetting import FeatureEnableSetting
 from src.types.settings.FeatureSettingRange import FeatureSettingRange
 
-from src.parser_namespace import runtime_value, is_enabled_at_runtime
+from src.parser_namespace import option_runtime_value, is_enabled_at_runtime
 
 from src.decl.utils.common_decl_utils import percentage_format, conditional_int
 
@@ -78,7 +78,7 @@ enable_settings: list[FeatureEnableSetting] = [
         default = 0.5,
 
         include_in_filename = lambda feature_name, value: (
-            runtime_value(feature_name, "bpm") > 0
+            option_runtime_value(feature_name, "bpm") > 0
         ),
 
         value_format = lambda feature_name, value: percentage_format(value)

@@ -8,7 +8,12 @@ from src.types.parameters.FeatureParameterApplicableComponent import FeaturePara
 from src.types.parameters.FeatureParameter import FeatureParameter
 from src.types.features.FeatureCombineMode import FeatureCombineMode
 
-from src.parser_namespace import runtime_value, is_enabled_at_runtime, override_runtime_value
+from src.parser_namespace import (
+    option_runtime_value,
+    input_property_runtime_value,
+    is_enabled_at_runtime,
+    override_runtime_value
+)
 
 from src.decl.filter_settings_list import (
     settings,
@@ -116,7 +121,7 @@ class Feature(Shortenable):
         if option_name not in self.get_valid_option_names(option_type):
             raise ValueError(f"Invalid {option_type} :", param_name)
 
-        return runtime_value(self.name, option_name)
+        return option_runtime_value(self.name, option_name)
 
     def check_option_value_range(self, option, option_type):
         option_value = self.get_option_value(option.name, option_type)
@@ -181,7 +186,7 @@ class Feature(Shortenable):
         # So there is no feature name prefix.
         # The runtime_namespace methods account for this.
 
-        return runtime_value("", video_info_name)
+        return input_property_runtime_value(video_info_name)
 
     # I don't particularly like having ffmpeg-related strings in this submodule.
     # They're not *technically* part of the FFMPEG filtergraph, but...still.

@@ -3,8 +3,6 @@ from src.types.features.Feature import Feature
 from src.types.parameters.FeatureParameterFormatter import FeatureParameterFormatter
 from src.types.settings.FeatureSettingFormatter import FeatureSettingFormatter
 
-from src.parser_namespace import runtime_value
-
 from src.decl.feature_list import prioritized_features
 from src.decl.filter_settings_list import enable_settings, video_settings
 
