@@ -129,7 +129,6 @@ def crop_filter(
     crop_edge_fade,
 
     crop_center_mode,
-    crop_relative_mode,
 
     crop_invert,
 
@@ -177,12 +176,6 @@ def crop_filter(
 
     if crop_center_mode:
 
-        if crop_relative_mode:
-            crop_center_x *= width
-            crop_width *= width
-            crop_center_y *= height
-            crop_height *= height
-
         crop_top, crop_bottom, crop_left, crop_right = (
             crop_center_y - crop_height / 2,
             crop_center_y + crop_height / 2,
@@ -191,13 +184,6 @@ def crop_filter(
         )
 
     else:
-
-        if crop_relative_mode:
-
-            crop_top *= height
-            crop_bottom *= height
-            crop_left *= width
-            crop_right *= width
 
         crop_center_x = crop_left + (crop_right - crop_left) / 2
         crop_center_y = crop_top + (crop_bottom - crop_top) / 2

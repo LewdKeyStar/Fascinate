@@ -13,11 +13,15 @@ from src.types.settings.FeatureSettingDefaultValues import FeatureSettingDefault
 
 from src.parser_namespace import option_runtime_value
 
-from src.decl.utils.argparse_types.common_argparse_types import video_time
+from src.decl.utils.argparse_types.common_argparse_types import (
+    video_time,
+    x_coordinate,
+    y_coordinate
+)
 
 from src.decl.utils.common_decl_utils import (
-    relative_format,
-    percentage_unit
+    x_percentage_format,
+    y_percentage_format
 )
 
 from os.path import sep
@@ -89,7 +93,7 @@ custom_features: list[CustomFeature] = [
                 type = bool,
                 default = DEFAULT_AFTERIMAGES_START_WHITE
             ),
-            
+
             FeatureParameter(
                 "extend",
                 special_shorthand = "xt",
@@ -155,43 +159,31 @@ custom_features: list[CustomFeature] = [
                 range = FeatureParameterRange(MIN_ZOOM_FACTOR, MAX_ZOOM_FACTOR),
                 default = DEFAULT_ZOOM_FACTOR,
             ),
+
             FeatureParameter(
                 "center_x",
                 special_shorthand = "x",
 
-                type = float,
+                type = x_coordinate,
 
                 default = DEFAULT_ZOOM_CENTER_X,
 
-                unit = lambda value: (
-                    "" if option_runtime_value("zoom", "center_x") == DEFAULT_ZOOM_CENTER_X
-                    else percentage_unit(if_is_relative = "zoom")
-                ),
+                unit = "%",
 
-                renamed_values = {DEFAULT_ZOOM_CENTER_X: "center"},
-                value_format = lambda value: relative_format(value, feature_name = "zoom")
+                value_format = x_percentage_format
             ),
+
             FeatureParameter(
                 "center_y",
                 special_shorthand = "y",
 
-                type = float,
+                type = y_coordinate,
 
                 default = DEFAULT_ZOOM_CENTER_Y,
 
-                unit = lambda value: (
-                    "" if option_runtime_value("zoom", "center_y") == DEFAULT_ZOOM_CENTER_Y
-                    else percentage_unit(if_is_relative = "zoom")
-                ),
+                unit = "%",
 
-                renamed_values = {DEFAULT_ZOOM_CENTER_Y: "center"},
-                value_format = lambda value: relative_format(value, feature_name = "zoom")
-            ),
-            FeatureParameter(
-                "relative_mode",
-                type = bool,
-                default = DEFAULT_ZOOM_RELATIVE_MODE,
-                include_in_filename = False
+                value_format = y_percentage_format
             )
         ],
 
@@ -230,39 +222,24 @@ custom_features: list[CustomFeature] = [
                 "unscaled_x",
                 special_shorthand = "x",
 
-                type = float,
+                type = x_coordinate,
                 default = DEFAULT_INTERSPERSE_UNSCALED_X,
 
-                unit = lambda value: (
-                    "" if option_runtime_value("intersperse", "unscaled_x") == DEFAULT_INTERSPERSE_UNSCALED_X
-                    else percentage_unit(if_is_relative = "intersperse")
-                ),
+                unit = "%",
 
-                renamed_values = {DEFAULT_INTERSPERSE_UNSCALED_X: "center"},
-                value_format = lambda value: relative_format(value, feature_name = "intersperse")
+                value_format = x_percentage_format
             ),
 
             FeatureParameter(
                 "unscaled_y",
                 special_shorthand = "y",
 
-                type = float,
+                type = y_coordinate,
                 default = DEFAULT_INTERSPERSE_UNSCALED_Y,
 
-                unit = lambda value: (
-                    "" if option_runtime_value("intersperse", "unscaled_y") == DEFAULT_INTERSPERSE_UNSCALED_Y
-                    else percentage_unit(if_is_relative = "intersperse")
-                ),
+                unit = "%",
 
-                renamed_values = {DEFAULT_INTERSPERSE_UNSCALED_Y: "center"},
-                value_format = lambda value: relative_format(value, feature_name = "intersperse")
-            ),
-
-            FeatureParameter(
-                "relative_mode",
-                type = bool,
-                default = DEFAULT_INTERSPERSE_RELATIVE_MODE,
-                include_in_filename = False
+                value_format = y_percentage_format
             ),
 
             # This parameter is for use with the seek_point option of movie,

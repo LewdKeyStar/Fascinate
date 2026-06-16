@@ -1,8 +1,6 @@
 from src.impl.utils.enable_settings_utils import interval_total_length
 
 from src.constants import (
-    DEFAULT_ZOOM_CENTER_X, DEFAULT_ZOOM_CENTER_Y,
-    DEFAULT_INTERSPERSE_UNSCALED_X, DEFAULT_INTERSPERSE_UNSCALED_Y,
     VALID_AXES, VALID_COLORS,
     TRANSPARENT_FFMPEG_COLOR
 )
@@ -59,21 +57,9 @@ def zoom_filter(
     zoom_center_x,
     zoom_center_y,
 
-    zoom_relative_mode,
-
     res,
     fps
 ):
-
-    if zoom_center_x == DEFAULT_ZOOM_CENTER_X:
-        zoom_center_x = "(iw / 2)" if not zoom_relative_mode else 0.5
-
-    if zoom_center_y == DEFAULT_ZOOM_CENTER_Y:
-        zoom_center_y = "(ih / 2)" if not zoom_relative_mode else 0.5
-
-    if zoom_relative_mode:
-        zoom_center_x = f"({str(zoom_center_x)}*iw)"
-        zoom_center_y = f"({str(zoom_center_y)}*ih)"
 
     return (
         f"zoompan=s={res}:fps={fps}:"
@@ -185,7 +171,6 @@ def intersperse_filter(
     intersperse_scale,
     intersperse_unscaled_x,
     intersperse_unscaled_y,
-    intersperse_relative_mode,
 
     intersperse_start_frame,
     intersperse_start_delay,
@@ -210,25 +195,6 @@ def intersperse_filter(
         )
 
     width, height = map(int, res.split("x"))
-
-    if intersperse_unscaled_x == DEFAULT_INTERSPERSE_UNSCALED_X:
-        intersperse_unscaled_x = (
-            width / 2
-            if not intersperse_relative_mode
-            else 0.5
-        )
-
-    if intersperse_unscaled_y == DEFAULT_INTERSPERSE_UNSCALED_Y:
-        intersperse_unscaled_y = (
-            height / 2
-            if not intersperse_relative_mode
-            else 0.5
-        )
-
-    if intersperse_relative_mode:
-
-        intersperse_unscaled_x *= width
-        intersperse_unscaled_y *= height
 
     movie_width, movie_height = map(int, get_resolution(intersperse_source).split("x"))
 

@@ -104,7 +104,7 @@ filter_bearing_video_settings: list[FilterBearingFeatureVideoSetting] = [
 
             "crop_edge_fade",
 
-            "crop_center_mode", "crop_relative_mode",
+            "crop_center_mode",
 
             "crop_invert"
         ],

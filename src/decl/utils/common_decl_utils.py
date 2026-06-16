@@ -1,4 +1,7 @@
-from src.parser_namespace import is_enabled_at_runtime
+from src.parser_namespace import (
+    is_enabled_at_runtime,
+    input_property_runtime_value
+)
 
 from math import modf
 
@@ -11,15 +14,10 @@ def conditional_int(value):
 def percentage_format(value):
     return conditional_int(100*value)
 
-def relative_format(value, feature_name):
-    return (
-        int(value) if not is_enabled_at_runtime(f"{feature_name}", "relative_mode")
-        else percentage_format(value)
-    )
+def x_percentage_format(value):
+    width = int(input_property_runtime_value("resolution").split("x")[0])
+    return percentage_format(value / width)
 
-def percentage_unit(*, if_is_relative):
-
-    return (
-        "%" if is_enabled_at_runtime(f"{if_is_relative}", f"relative_mode")
-        else "px"
-    )
+def y_percentage_format(value):
+    height = int(input_property_runtime_value("resolution").split("x")[1])
+    return percentage_format(value / height)

@@ -114,3 +114,50 @@ def video_time(string):
         raise ValueError("video_time : Time provided is greater than video duration")
 
     return frame_number
+
+def coordinate(string, axis):
+
+    try:
+        value = float(string)
+    except:
+        raise ValueError("coordinate : non-float value provided")
+
+    # FIXME : we need to allow default values outside the sensible range,
+    # For the purposes of signaling in crop coordinates.
+    # It can either be None or a negative number,
+    # And the latter, though problematic, is preferable,
+    # Since it will be handled fine by FFMPEG.
+
+    # if value < 0:
+    #
+    #     raise ValueError("coordinate : negative coordinate provided")
+
+    if value > 1:
+
+        return round(value)
+
+    else:
+
+        width, height = map(int, input_property_runtime_value("resolution").split("x"))
+
+        return (
+            value * width
+            if axis == "x"
+            else value * height
+        )
+
+def x_coordinate(string):
+
+    return coordinate(string, axis = "x")
+
+def y_coordinate(string):
+
+    return coordinate(string, axis = "y")
+
+def x_dimension(string):
+
+    return x_coordinate(string)
+
+def y_dimension(string):
+
+    return y_coordinate(string)

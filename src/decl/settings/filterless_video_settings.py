@@ -6,12 +6,16 @@ from src.constants import VALID_FADE_FUNCTIONS, DEFAULT_FADE_FUNCTION
 
 from src.parser_namespace import is_enabled_at_runtime
 
-from src.decl.utils.argparse_types.common_argparse_types import video_time
+from src.decl.utils.argparse_types.common_argparse_types import (
+    video_time,
+    x_coordinate, y_coordinate,
+    x_dimension, y_dimension
+)
 
 from src.decl.utils.common_decl_utils import (
     percentage_format,
-    relative_format,
-    percentage_unit
+    x_percentage_format,
+    y_percentage_format
 )
 
 from src.decl.utils.setting_decl_utils import (
@@ -112,17 +116,13 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
     FilterLessFeatureVideoSetting(
         name = "crop_top",
         special_shorthand = "crt",
-        type = float,
+        type = y_coordinate,
 
         default = -1,
 
-        unit = lambda feature_name, value: (
-            percentage_unit(if_is_relative = f"{feature_name}_crop")
-        ),
+        unit = "%",
 
-        value_format = lambda feature_name, value: (
-            relative_format(value, feature_name = f"{feature_name}_crop")
-        ),
+        value_format = lambda feature_name, value: y_percentage_format(value),
 
         include_in_filename = crop_corner_mode_enabled
     ),
@@ -130,17 +130,13 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
     FilterLessFeatureVideoSetting(
         name = "crop_bottom",
         special_shorthand = "crb",
-        type = float,
+        type = y_coordinate,
 
         default = -1,
 
-        unit = lambda feature_name, value: (
-            percentage_unit(if_is_relative = f"{feature_name}_crop")
-        ),
+        unit = "%",
 
-        value_format = lambda feature_name, value: (
-            relative_format(value, feature_name = f"{feature_name}_crop")
-        ),
+        value_format = lambda feature_name, value: y_percentage_format(value),
 
         include_in_filename = crop_corner_mode_enabled
     ),
@@ -148,17 +144,13 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
     FilterLessFeatureVideoSetting(
         name = "crop_left",
         special_shorthand = "crl",
-        type = float,
+        type = x_coordinate,
 
         default = -1,
 
-        unit = lambda feature_name, value: (
-            percentage_unit(if_is_relative = f"{feature_name}_crop")
-        ),
+        unit = "%",
 
-        value_format = lambda feature_name, value: (
-            relative_format(value, feature_name = f"{feature_name}_crop")
-        ),
+        value_format = lambda feature_name, value: x_percentage_format(value),
 
         include_in_filename = crop_corner_mode_enabled
     ),
@@ -166,17 +158,13 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
     FilterLessFeatureVideoSetting(
         name = "crop_right",
         special_shorthand = "crr",
-        type = float,
+        type = x_coordinate,
 
         default = -1,
 
-        unit = lambda feature_name, value: (
-            percentage_unit(if_is_relative = f"{feature_name}_crop")
-        ),
+        unit = "%",
 
-        value_format = lambda feature_name, value: (
-            relative_format(value, feature_name = f"{feature_name}_crop")
-        ),
+        value_format = lambda feature_name, value: x_percentage_format(value),
 
         include_in_filename = crop_corner_mode_enabled
     ),
@@ -184,17 +172,13 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
     FilterLessFeatureVideoSetting(
         name = "crop_center_x",
         special_shorthand = "crx",
-        type = float,
+        type = x_coordinate,
 
         default = -1,
 
-        unit = lambda feature_name, value: (
-            percentage_unit(if_is_relative = f"{feature_name}_crop")
-        ),
+        unit = "%",
 
-        value_format = lambda feature_name, value: (
-            relative_format(value, feature_name = f"{feature_name}_crop")
-        ),
+        value_format = lambda feature_name, value: x_percentage_format(value),
 
         include_in_filename = crop_center_mode_enabled
     ),
@@ -202,17 +186,13 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
     FilterLessFeatureVideoSetting(
         name = "crop_center_y",
         special_shorthand = "cry",
-        type = float,
+        type = y_coordinate,
 
         default = -1,
 
-        unit = lambda feature_name, value: (
-            percentage_unit(if_is_relative = f"{feature_name}_crop")
-        ),
+        unit = "%",
 
-        value_format = lambda feature_name, value: (
-            relative_format(value, feature_name = f"{feature_name}_crop")
-        ),
+        value_format = lambda feature_name, value: y_percentage_format(value),
 
         include_in_filename = crop_center_mode_enabled
     ),
@@ -220,17 +200,13 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
     FilterLessFeatureVideoSetting(
         name = "crop_width",
         special_shorthand = "crw",
-        type = float,
+        type = x_dimension,
 
         default = -1,
 
-        unit = lambda feature_name, value: (
-            percentage_unit(if_is_relative = f"{feature_name}_crop")
-        ),
+        unit = "%",
 
-        value_format = lambda feature_name, value: (
-            relative_format(value, feature_name = f"{feature_name}_crop")
-        ),
+        value_format = lambda feature_name, value: x_percentage_format(value),
 
         include_in_filename = crop_center_mode_enabled
     ),
@@ -238,17 +214,13 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
     FilterLessFeatureVideoSetting(
         name = "crop_height",
         special_shorthand = "crh",
-        type = float,
+        type = y_dimension,
 
         default = -1,
 
-        unit = lambda feature_name, value: (
-            percentage_unit(if_is_relative = f"{feature_name}_crop")
-        ),
+        unit = "%",
 
-        value_format = lambda feature_name, value: (
-            relative_format(value, feature_name = f"{feature_name}_crop")
-        ),
+        value_format = lambda feature_name, value: y_percentage_format(value),
 
         include_in_filename = crop_center_mode_enabled
     ),
@@ -267,15 +239,6 @@ filterless_video_settings: list[FilterLessFeatureVideoSetting] = [
     FilterLessFeatureVideoSetting(
         name = "crop_center_mode",
         special_shorthand = "crcm",
-        type = bool,
-        default = False,
-
-        include_in_filename = False
-    ),
-
-    FilterLessFeatureVideoSetting(
-        name = "crop_relative_mode",
-        special_shorthand = "crrm",
         type = bool,
         default = False,
 
