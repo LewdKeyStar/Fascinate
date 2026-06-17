@@ -20,9 +20,9 @@ from src.utils.ffprobe_utils import (
 def shake_filter(
     shake_axis,
 
-    shake_amplitude,
-    shake_frequency,
-    shake_dampen,
+    shake_amplitude, # in pixels
+    shake_frequency, # in Hz !
+    shake_dampen, # TODO : replace/complement with target decay frames, a la ImageManipScripts
 
     shake_blur_radius,
 
@@ -34,14 +34,33 @@ def shake_filter(
     fps
 ):
 
+    # Reminder : this filter uses a frequency in Hz,
+    # Therefore frame values have to be converted in seconds.
+    # This is the only time this happens in the entire repo.
+
     def t_modulo_interval():
-        interval = interval_total_length(shake_pause, shake_active)/fps
-        modulo = interval if round(interval) >= 1 else 1 # = modulo every second
-        # we could also to a half-second, or a certain fraction of the FPS...
 
         # FIXME : replace with effective_feature_start ?
         # This doesn't seem to cause problems here somehow...
-        return f'mod(t-{start_shake_at/fps},{modulo})'
+
+        start_shake_at_seconds = start_shake_at / fps
+        offset_t = f"t-{start_shake_at_seconds}"
+
+        interval = interval_total_length(shake_pause, shake_active) / fps
+
+        # If there is no pause interval, there is nothing to modulo to.
+
+        if interval == 0:
+            return offset_t
+
+        # If the pause interval results in a modulo interval below 0.5, modulo doesn't work.
+        # So instead we default to a supposedly "small" interval of 1 second
+        # we could also to a half-second, or a certain fraction of the FPS...
+        # TODO : yeah, there's probably a better choice.
+
+        modulo = interval if round(interval) >= 1 else 1
+
+        return f'mod({offset_t}, {modulo})'
 
     return (
         f"split[orig][moving];"

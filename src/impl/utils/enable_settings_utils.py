@@ -33,7 +33,7 @@ def bpm_synced_intervals(bpm, active_percent, fps, start, should_invert):
 def interval_total_length(pause_interval, active_interval):
 
     if pause_interval == 0:
-        return 1
+        return 0 # signals that there is no pause cycle, and no modulo should be applied
 
     elif active_interval == 0:
         return 2*pause_interval
