@@ -249,7 +249,7 @@ custom_features: list[CustomFeature] = [
 
             FeatureParameter(
                 "start_frame",
-                type = int
+                type = video_time
             ),
 
             # This parameter time-pads the interspersed movie for the given amount of frames.
@@ -257,7 +257,7 @@ custom_features: list[CustomFeature] = [
 
             FeatureParameter(
                 "start_delay",
-                type = int
+                type = video_time
             ),
 
             FeatureParameter(
